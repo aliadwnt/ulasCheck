@@ -1,0 +1,33 @@
+<div class="font-poppins w-64 bg-yellow-600 text-white min-h-screen p-6">
+    <h2 class="text-2xl font-semibold mb-8">ShopeeMeter</h2>
+    <ul>
+        <li>
+            <a href="/admin/dashboard" 
+               class="block py-2 px-4 rounded-md hover:bg-orange-700 
+                      {% if request.endpoint == 'admin_dashboard' %} bg-orange-600 {% endif %}">
+               Dashboard
+            </a>
+        </li>
+        <li>
+            <a href="/admin/history" 
+               class="block py-2 px-4 rounded-md hover:bg-orange-700 
+                      {% if request.endpoint == 'admin_history' %} bg-orange-600 {% endif %}">
+               History
+            </a>
+        </li>
+        <li>
+            <a href="/admin/dataset" 
+               class="block py-2 px-4 rounded-md hover:bg-orange-700 
+                      {% if request.endpoint == 'admin_dataset' %} bg-orange-600 {% endif %}">
+               Dataset
+            </a>
+        </li>
+        <li>
+            <a href="/admin/evaluation" 
+               class="block py-2 px-4 rounded-md hover:bg-orange-700 
+                      {% if request.endpoint == 'dna_evaluation' %} bg-orange-600 {% endif %}">
+               Evaluation
+            </a>
+        </li>
+    </ul>
+</div>

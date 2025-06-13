@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <title>Login</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 min-h-screen flex flex-col">
+    {% include 'components/navbar.html' %}
+
+    <main class="flex flex-1 items-center justify-center">
+        <form action="/admin/login" method="POST" class="bg-white p-8 rounded-xl shadow-md w-full max-w-md">
+            <h2 class="text-2xl font-bold mb-6 text-center">Login</h2>
+
+            {% if error %}
+            <p class="text-red-600 text-sm mb-4 text-center">{{ error }}</p>
+            {% endif %}
+
+            <div class="mb-4">
+                <label for="username" class="block text-gray-700">Username</label>
+                <input type="text" id="username" name="username" required class="w-full mt-1 p-2 border rounded-md">
+            </div>
+
+            <div class="mb-6">
+                <label for="password" class="block text-gray-700">Password</label>
+                <input type="password" id="password" name="password" required class="w-full mt-1 p-2 border rounded-md">
+            </div>
+
+            <button type="submit" class="w-full bg-orange-600 text-white py-2 rounded-md hover:bg-orange-700 transition">Login</button>
+        </form>
+    </main>
+
+    {% include 'components/footer-home.html' %}
+</body>
+</html>

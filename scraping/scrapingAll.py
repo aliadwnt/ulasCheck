@@ -143,7 +143,7 @@ def shopee(url, cookies_json):
 
     offset = 0
     limit = 6
-    max_reviews = 120000
+    max_reviews = 24
     result = []
 
     while len(result) < max_reviews:

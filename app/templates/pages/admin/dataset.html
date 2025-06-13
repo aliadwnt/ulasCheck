@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}{% endblock %}</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 min-h-screen flex">
+
+    {% include 'components/sidebar.html' %}
+
+    <!-- Konten Utama -->
+    <div class="flex-1 p-6">
+        <!-- Navbar dari komponen -->
+        {% include 'components/header.html' %}
+<div class="overflow-x-auto bg-white p-4 rounded-lg shadow-md">
+            <table class="min-w-full divide-y divide-gray-200">
+                <thead class="bg-gray-100">
+                    <tr>
+                        <th class="px-4 py-2 text-left text-xs font-semibold text-gray-600 uppercase">No</th>
+                        <th class="px-4 py-2 text-left text-xs font-semibold text-gray-600 uppercase">Nama Pengguna</th>
+                        <th class="px-4 py-2 text-left text-xs font-semibold text-gray-600 uppercase">Rating</th>
+                        <th class="px-4 py-2 text-left text-xs font-semibold text-gray-600 uppercase">Tanggal</th>
+                        <th class="px-4 py-2 text-left text-xs font-semibold text-gray-600 uppercase">Isi Ulasan</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-200 text-sm text-gray-700">
+                    {% for i, row in enumerate(data) %}
+                    <tr>
+                        <td class="px-4 py-2">{{ i + 1 }}</td>
+                        <td class="px-4 py-2">{{ row.userName }}</td>
+                        <td class="px-4 py-2">{{ row.score }}</td>
+                        <td class="px-4 py-2">{{ row.at }}</td>
+                        <td class="px-4 py-2">{{ row.content }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        <!-- Konten halaman -->
+        <main>
+            {% block content %}{% endblock %}
+        </main>
+
+        <!-- Footer dari komponen -->
+        {% include 'components/footer.html' %}
+    </div>
+
+</body>
+</html>

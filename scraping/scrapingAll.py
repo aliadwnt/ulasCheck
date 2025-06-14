@@ -143,7 +143,7 @@ def shopee(url, cookies_json):
 
     offset = 0
     limit = 6
-    max_reviews = 24
+    max_reviews = 10000
     result = []
 
     while len(result) < max_reviews:
@@ -209,7 +209,7 @@ def shopee(url, cookies_json):
         print("⚠️ Tidak ada data review yang berhasil diambil.")
 
 if __name__ == '__main__':
-    url_shop = "https://shopee.co.id/buyer/348325220/rating?shop_id=348305645"
+    url_shop = "https://shopee.co.id/buyer/1262522569/rating?shop_id=1262052466"
     cookies_json = r"D:\shopee\scraping\cookies.json"
     shopee(url_shop, cookies_json)
 

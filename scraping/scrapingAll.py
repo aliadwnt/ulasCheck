@@ -209,7 +209,7 @@ def shopee(url, cookies_json):
         print("⚠️ Tidak ada data review yang berhasil diambil.")
 
 if __name__ == '__main__':
-    url_shop = "https://shopee.co.id/buyer/481541891/rating?shop_id=481522314"
+    url_shop = "https://shopee.co.id/buyer/111602485/rating?shop_id=111600895"
     cookies_json = r"D:\shopee\scraping\cookies.json"
     shopee(url_shop, cookies_json)
 

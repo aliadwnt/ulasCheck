@@ -1,0 +1,30 @@
+{% extends "index.html" %}
+{% block title %}Cek Toko Shopee{% endblock %}
+
+{% include 'components/navbar.html' %}
+{% block content %}
+<div class="max-w-xl mx-auto mt-20">
+  <h1 class="text-3xl font-bold mb-4">Analisis Ulasan Toko Shopee</h1>
+  <form method="POST" class="space-y-4">
+    <input type="text" name="link" placeholder="Masukkan link toko Shopee..."
+           class="w-full p-3 border rounded-lg focus:outline-none" required />
+    <button type="submit"
+            class="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition">
+      Analisis Sekarang
+    </button>
+  </form>
+
+  {% if result %}
+  <div class="mt-10 bg-white p-5 rounded shadow">
+    <h2 class="text-xl font-semibold mb-2">Hasil Analisis</h2>
+    <ul class="space-y-1">
+      <li><strong>Total Ulasan:</strong> {{ result.total_all }}</li>
+      <li><strong>Positif:</strong> {{ result.total_pos }} ({{ result.persen_pos }}%)</li>
+      <li><strong>Negatif:</strong> {{ result.total_neg }} ({{ 100 - result.persen_pos }}%)</li>
+      <li><strong>Label Toko:</strong> <span class="font-bold">{{ result.toko_label }}</span></li>
+      <li><strong>Aspek Menonjol:</strong> {{ result.aspek }} ({{ result.persen_tertinggi }}%)</li>
+    </ul>
+  </div>
+  {% endif %}
+</div>
+{% endblock %}

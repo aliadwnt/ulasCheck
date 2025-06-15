@@ -185,7 +185,7 @@ def shopee(url, cookies_json):
                 print(f"✅ Mengambil review dari: {data_result['Username']}")
 
             offset += limit
-            time.sleep(2)
+            time.sleep(0.1)
         except requests.exceptions.Timeout:
             print("[ERROR] Timeout saat request ke Shopee.")
             break

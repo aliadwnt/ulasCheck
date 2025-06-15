@@ -1,14 +1,36 @@
-{% extends 'base.html' %}
+{% extends "index.html" %}
 
-{% block title %}Beranda Pengguna{% endblock %}
+{% block title %}Tentang Kami - ulasCheck{% endblock %}
 
 {% block content %}
-    {% include 'components/navbar.html' %}
-    
-    <main class="flex-1 p-6">
-        <h1 class="text-3xl font-bold text-gray-800">Halo, User ini About Us!</h1>
-        <p class="text-gray-600 mt-2">Ini adalah halaman beranda pengguna.</p>
-    </main>
+  {% include 'components/navbar.html' %}
 
-    {% include 'components/footer-home.html' %}
+  <section class="min-h-screen bg-gray-50 py-16 px-6 font-[Poppins]">
+    <div class="max-w-4xl mx-auto bg-white p-8 rounded-2xl shadow-xl">
+      <h1 class="text-3xl font-bold text-orange-800 mb-6 text-center">Tentang ulasCheck</h1>
+
+      <p class="text-gray-700 leading-relaxed text-justify">
+        <strong>ulasCheck</strong> adalah sebuah platform yang dirancang untuk membantu pengguna menganalisis kualitas toko di Shopee berdasarkan ulasan pelanggan.
+        Dengan teknologi analisis sentimen dan pembelajaran mesin, kami menyajikan informasi akurat dan cepat tentang performa toko, sehingga kamu dapat membuat keputusan belanja yang lebih bijak.
+      </p>
+
+      <div class="mt-6">
+        <h2 class="text-xl font-semibold text-gray-800 mb-2">🔍 Fitur Utama</h2>
+        <ul class="list-disc list-inside space-y-2 text-gray-700">
+          <li>Analisis sentimen otomatis dari ulasan toko.</li>
+          <li>Penilaian rekomendasi toko berdasarkan rating dan ulasan.</li>
+          <li>Identifikasi aspek paling menonjol dari pelayanan toko.</li>
+        </ul>
+      </div>
+
+      <div class="mt-8">
+        <h2 class="text-xl font-semibold text-gray-800 mb-2">📫 Hubungi Kami</h2>
+        <p class="text-gray-700">
+          Jika kamu memiliki pertanyaan, masukan, atau ingin bekerja sama, silakan hubungi kami melalui email:
+          <a href="mailto:support@ulascheck.com" class="text-blue-600 hover:underline">support@ulascheck.com</a>
+        </p>
+      </div>
+    </div>
+  </section>
+ {% include 'components/footer.html' %}
 {% endblock %}

@@ -1,23 +1,78 @@
-<nav class="bg-orange-600 shadow-md">
-  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-    <div class="flex justify-between h-16 items-center">
-      <!-- Logo -->
-      <div class="flex-shrink-0">
-        <a href="/" class="text-xl font-bold text-yellow-100">ShopeeMeter</a>
-      </div>
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
 
-      <!-- Navigation Links -->
-      <div class="hidden md:flex space-x-8">
-        <a href="/" class="text-orange-100 hover:text-orange-400">Home</a>
-        <a href="/user/about-us" class="text-orange-100 hover:text-orange-400">About Us</a>
-      </div>
+  <title>Navbar ulasCheck</title>
+  <style>
+    body {
+      font-family: 'Poppins', sans-serif;
+    }
+  </style>
+</head>
+<body class="bg-gray-50 font-[Poppins]">
 
-      <!-- Login Button -->
-      <div>
-        <a href="/admin/login" class="bg-orange-600 text-white px-4 py-2 rounded-md hover:bg-orange-700 transition">
-          Login
-        </a>
+  <nav class="bg-gradient-to-r from-orange-600 to-orange-500 shadow-lg">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex justify-between h-16 items-center">
+        <!-- Logo -->
+        <div class="flex items-center space-x-2">
+          <img src="https://img.icons8.com/ios-filled/30/ffffff/search.png" alt="Logo" class="h-6 w-6" />
+          <a href="/" class="text-2xl font-bold text-white tracking-wide">
+            ulas<span class="text-yellow-300">Check</span>
+          </a>
+        </div>
+
+        <!-- Mobile Menu Button -->
+        <div class="md:hidden">
+          <button id="mobile-menu-button" class="text-white focus:outline-none">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2"
+              viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+              <path stroke-linecap="round" stroke-linejoin="round"
+                d="M4 6h16M4 12h16M4 18h16"></path>
+            </svg>
+          </button>
+        </div>
+
+        <!-- Desktop Navigation Links -->
+        <div class="hidden md:flex items-center space-x-8">
+          <a href="/" class="text-white font-medium hover:text-yellow-200 transition duration-300">Home</a>
+          <a href="/about-us" class="text-white font-medium hover:text-yellow-200 transition duration-300">About Us</a>
+        </div>
+
+        <!-- Login Button -->
+        <div class="hidden md:block">
+          <a href="/admin/login"
+            class="bg-white text-orange-600 font-semibold px-4 py-2 rounded-lg shadow hover:bg-yellow-100 hover:text-orange-700 transition duration-300">
+            Login
+          </a>
+        </div>
       </div>
     </div>
-  </div>
-</nav>
+
+    <!-- Mobile Menu (hidden by default) -->
+    <div id="mobile-menu" class="hidden md:hidden px-4 pb-4">
+      <a href="/" class="block text-white py-2 font-medium hover:text-yellow-200">Home</a>
+      <a href="/about-us" class="block text-white py-2 font-medium hover:text-yellow-200">About Us</a>
+      <a href="/admin/login"
+        class="block w-full text-center mt-2 bg-white text-orange-600 font-semibold px-4 py-2 rounded-lg shadow hover:bg-yellow-100 hover:text-orange-700 transition duration-300">
+        Login
+      </a>
+    </div>
+  </nav>
+
+  <script>
+    const btn = document.getElementById('mobile-menu-button');
+    const menu = document.getElementById('mobile-menu');
+
+    btn.addEventListener('click', () => {
+      menu.classList.toggle('hidden');
+    });
+  </script>
+
+</body>
+</html>

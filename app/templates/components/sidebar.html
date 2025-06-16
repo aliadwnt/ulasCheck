@@ -1,5 +1,8 @@
-<div class="font-poppins w-64 bg-orange-500 text-white min-h-screen flex flex-col justify-between p-6">
+<!-- Sidebar -->
+<div id="sidebar"
+     class="font-poppins w-64 bg-orange-500 text-white min-h-screen fixed md:static z-30 inset-y-0 left-0 transform -translate-x-full md:translate-x-0 transition-transform duration-300 ease-in-out p-6 flex flex-col justify-between">
   <div>
+    <!-- Logo -->
     <a href="/" class="flex flex-col items-center justify-center mb-8 group transition text-center">
       <div class="bg-gradient-to-br from-orange-500 to-yellow-400 rounded-full p-3 shadow-lg mb-2 group-hover:scale-105 transition-transform duration-300">
         <img src="https://img.icons8.com/ios-filled/36/ffffff/search.png" alt="Logo" class="h-6 w-6" />
@@ -8,37 +11,37 @@
         ulas<span class="text-yellow-200">Check</span>
       </span>
     </a>
+
+    <!-- Menu Items -->
     <ul class="space-y-2">
       <li>
         <a href="{{ url_for('main.adminDashboard') }}"
-           class="block py-2 px-4 rounded-md transition-colors duration-200 hover:bg-orange-700
-                  {% if request.endpoint == 'main.adminDashboard' %} bg-orange-700 {% endif %}">
+           class="block py-2 px-4 rounded-md hover:bg-orange-700 {% if request.endpoint == 'main.adminDashboard' %} bg-orange-700 {% endif %}">
           Dashboard
         </a>
       </li>
       <li>
         <a href="{{ url_for('main.adminHistory') }}"
-           class="block py-2 px-4 rounded-md transition-colors duration-200 hover:bg-orange-700
-                  {% if request.endpoint == 'main.adminHistory' %} bg-orange-700 {% endif %}">
+           class="block py-2 px-4 rounded-md hover:bg-orange-700 {% if request.endpoint == 'main.adminHistory' %} bg-orange-700 {% endif %}">
           History
         </a>
       </li>
       <li>
         <a href="{{ url_for('main.adminDataset') }}"
-           class="block py-2 px-4 rounded-md transition-colors duration-200 hover:bg-orange-700
-                  {% if request.endpoint == 'main.adminDataset' %} bg-orange-700 {% endif %}">
+           class="block py-2 px-4 rounded-md hover:bg-orange-700 {% if request.endpoint == 'main.adminDataset' %} bg-orange-700 {% endif %}">
           Dataset
         </a>
       </li>
       <li>
         <a href="{{ url_for('main.adminEvaluation') }}"
-           class="block py-2 px-4 rounded-md transition-colors duration-200 hover:bg-orange-700
-                  {% if request.endpoint == 'main.adminEvaluation' %} bg-orange-700 {% endif %}">
+           class="block py-2 px-4 rounded-md hover:bg-orange-700 {% if request.endpoint == 'main.adminEvaluation' %} bg-orange-700 {% endif %}">
           Evaluation
         </a>
       </li>
     </ul>
   </div>
+
+  <!-- Logout -->
   <div class="mt-8">
     <a href="{{ url_for('main.logout') }}"
        class="block w-full text-center py-2 px-4 bg-yellow-400 hover:bg-yellow-500 text-white font-semibold rounded-md transition">
@@ -46,3 +49,22 @@
     </a>
   </div>
 </div>
+
+<!-- Toggle Button (visible on small screen) -->
+<button id="toggleSidebar"
+        class="fixed top-4 left-4 z-40 md:hidden bg-orange-500 text-white p-2 rounded-md shadow-md focus:outline-none">
+  <!-- Hamburger Icon -->
+  <svg class="h-6 w-6" fill="none" stroke="currentColor" stroke-width="2"
+       viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+    <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16"></path>
+  </svg>
+</button>
+
+<script>
+  const toggleBtn = document.getElementById('toggleSidebar');
+  const sidebar = document.getElementById('sidebar');
+
+  toggleBtn.addEventListener('click', () => {
+    sidebar.classList.toggle('-translate-x-full');
+  });
+</script>

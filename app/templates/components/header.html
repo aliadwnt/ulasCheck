@@ -1,6 +1,11 @@
-<header class="bg-white shadow p-4 flex justify-between items-center">
-    <h1 class="text-2xl font-bold text-gray-700">Dashboard Admin</h1>
-    <div>
-        <span class="text-gray-600">Halo, Admin</span>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+
+<header class="bg-white shadow p-4 flex justify-between items-center font-poppins">
+    <div class="ml-auto">
+        {% if current_user %}
+            <span class="text-gray-600">Halo, {{ current_user.username }}</span>
+        {% else %}
+            <span class="text-gray-600">Halo, Admin</span>
+        {% endif %}
     </div>
 </header>

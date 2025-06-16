@@ -1,33 +1,48 @@
-<div class="font-poppins w-64 bg-yellow-600 text-white min-h-screen p-6">
-    <h2 class="text-2xl font-semibold mb-8">ShopeeMeter</h2>
-    <ul>
-        <li>
-            <a href="/admin/dashboard" 
-               class="block py-2 px-4 rounded-md hover:bg-orange-700 
-                      {% if request.endpoint == 'admin_dashboard' %} bg-orange-600 {% endif %}">
-               Dashboard
-            </a>
-        </li>
-        <li>
-            <a href="/admin/history" 
-               class="block py-2 px-4 rounded-md hover:bg-orange-700 
-                      {% if request.endpoint == 'admin_history' %} bg-orange-600 {% endif %}">
-               History
-            </a>
-        </li>
-        <li>
-            <a href="/admin/dataset" 
-               class="block py-2 px-4 rounded-md hover:bg-orange-700 
-                      {% if request.endpoint == 'admin_dataset' %} bg-orange-600 {% endif %}">
-               Dataset
-            </a>
-        </li>
-        <li>
-            <a href="/admin/evaluation" 
-               class="block py-2 px-4 rounded-md hover:bg-orange-700 
-                      {% if request.endpoint == 'dna_evaluation' %} bg-orange-600 {% endif %}">
-               Evaluation
-            </a>
-        </li>
+<div class="font-poppins w-64 bg-orange-500 text-white min-h-screen flex flex-col justify-between p-6">
+  <div>
+    <a href="/" class="flex flex-col items-center justify-center mb-8 group transition text-center">
+      <div class="bg-gradient-to-br from-orange-500 to-yellow-400 rounded-full p-3 shadow-lg mb-2 group-hover:scale-105 transition-transform duration-300">
+        <img src="https://img.icons8.com/ios-filled/36/ffffff/search.png" alt="Logo" class="h-6 w-6" />
+      </div>
+      <span class="text-2xl font-extrabold tracking-wide text-white group-hover:text-yellow-300 transition-colors duration-300">
+        ulas<span class="text-yellow-200">Check</span>
+      </span>
+    </a>
+    <ul class="space-y-2">
+      <li>
+        <a href="{{ url_for('main.adminDashboard') }}"
+           class="block py-2 px-4 rounded-md transition-colors duration-200 hover:bg-orange-700
+                  {% if request.endpoint == 'main.adminDashboard' %} bg-orange-700 {% endif %}">
+          Dashboard
+        </a>
+      </li>
+      <li>
+        <a href="{{ url_for('main.adminHistory') }}"
+           class="block py-2 px-4 rounded-md transition-colors duration-200 hover:bg-orange-700
+                  {% if request.endpoint == 'main.adminHistory' %} bg-orange-700 {% endif %}">
+          History
+        </a>
+      </li>
+      <li>
+        <a href="{{ url_for('main.adminDataset') }}"
+           class="block py-2 px-4 rounded-md transition-colors duration-200 hover:bg-orange-700
+                  {% if request.endpoint == 'main.adminDataset' %} bg-orange-700 {% endif %}">
+          Dataset
+        </a>
+      </li>
+      <li>
+        <a href="{{ url_for('main.adminEvaluation') }}"
+           class="block py-2 px-4 rounded-md transition-colors duration-200 hover:bg-orange-700
+                  {% if request.endpoint == 'main.adminEvaluation' %} bg-orange-700 {% endif %}">
+          Evaluation
+        </a>
+      </li>
     </ul>
+  </div>
+  <div class="mt-8">
+    <a href="{{ url_for('main.logout') }}"
+       class="block w-full text-center py-2 px-4 bg-yellow-400 hover:bg-yellow-500 text-white font-semibold rounded-md transition">
+      Logout
+    </a>
+  </div>
 </div>

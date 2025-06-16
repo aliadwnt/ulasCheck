@@ -12,53 +12,52 @@
     }
   </style>
 </head>
-    <body class="bg-gradient-to-br from-orange-100 via-yellow-100 to-white min-h-screen flex items-center justify-center px-4 sm:px-6 lg:px-8">
-    <div class="w-full max-w-md space-y-6 bg-white p-6 sm:p-8 rounded-2xl shadow-xl">
-        <!-- <a href="/" class="flex items-center justify-center space-x-4 mb-6 group transition">
-        <div class="bg-gradient-to-br from-orange-500 to-yellow-400 rounded-full p-3 shadow-lg group-hover:scale-105 transition-transform duration-300">
-            <img src="https://img.icons8.com/ios-filled/36/ffffff/search.png" alt="Logo" class="h-6 w-6" />
-        </div>
-        <span class="text-3xl font-extrabold tracking-wide text-gray-800 group-hover:text-orange-600 transition-colors duration-300">
-            ulas<span class="text-yellow-400">Check</span>
-        </span>
-        </a> -->
-        <a href="/" class="flex flex-col items-center justify-center mb-6 group transition text-center">
-            <!-- Icon di atas -->
-            <div class="bg-gradient-to-br from-orange-500 to-yellow-400 rounded-full p-3 shadow-lg mb-2 group-hover:scale-105 transition-transform duration-300">
-                <img src="https://img.icons8.com/ios-filled/36/ffffff/search.png" alt="Logo" class="h-6 w-6" />
-            </div>
-            <!-- Teks di bawah -->
-            <span class="text-4xl font-extrabold tracking-wide text-gray-800 group-hover:text-orange-600 transition-colors duration-300">
-                ulas<span class="text-yellow-400">Check</span>
-            </span>
-        </a>
-        <div class="text-center">
-        <h2 class="text-2xl font-bold text-gray-800">Selamat Datang 👋</h2>
-        <p class="mt-1 text-sm text-gray-500">Silakan login untuk masuk ke halaman admin</p>
-        </div>
+<body class="bg-gradient-to-br from-orange-100 via-yellow-100 to-white min-h-screen flex items-center justify-center px-4 sm:px-6 lg:px-8">
+  <div class="w-full max-w-md space-y-6 bg-white p-6 sm:p-8 rounded-2xl shadow-xl">
+    <a href="/" class="flex flex-col items-center justify-center mb-6 group transition text-center">
+      <div class="bg-gradient-to-br from-orange-500 to-yellow-400 rounded-full p-3 shadow-lg mb-2 group-hover:scale-105 transition-transform duration-300">
+        <img src="https://img.icons8.com/ios-filled/36/ffffff/search.png" alt="Logo" class="h-6 w-6" />
+      </div>
+      <span class="text-4xl font-extrabold tracking-wide text-gray-800 group-hover:text-orange-600 transition-colors duration-300">
+        ulas<span class="text-yellow-400">Check</span>
+      </span>
+    </a>
 
-        {% if error %}
-        <p class="text-red-600 text-sm text-center">{{ error }}</p>
-        {% endif %}
-
-        <form action="/admin/login" method="POST" class="space-y-5">
-        <div>
-            <label for="username" class="block text-sm font-medium text-gray-700 mb-1">Username</label>
-            <input type="text" id="username" name="username" required
-                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-300" />
-        </div>
-
-        <div>
-            <label for="password" class="block text-sm font-medium text-gray-700 mb-1">Password</label>
-            <input type="password" id="password" name="password" required
-                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-300" />
-        </div>
-
-        <button type="submit"
-                class="w-full py-2 px-4 bg-orange-600 text-white font-semibold rounded-lg hover:bg-orange-700 transition duration-300">
-            Login
-        </button>
-        </form>
+    <div class="text-center">
+      <h2 class="text-2xl font-bold text-gray-800">Selamat Datang 👋</h2>
+      <p class="mt-1 text-sm text-gray-500">Silakan login untuk masuk ke halaman admin</p>
     </div>
-    </body>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        <div class="text-sm text-center">
+          {% for category, message in messages %}
+            <p class="{% if category == 'error' %}text-red-600{% else %}text-green-600{% endif %}">
+              {{ message }}
+            </p>
+          {% endfor %}
+        </div>
+      {% endif %}
+    {% endwith %}
+
+    <form action="{{ url_for('main.login_submit') }}" method="POST" class="space-y-5" autocomplete="off">
+      <div>
+        <label for="username" class="block text-sm font-medium text-gray-700 mb-1">Username</label>
+        <input type="text" id="username" name="username" required
+               class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-300" />
+      </div>
+
+      <div>
+        <label for="password" class="block text-sm font-medium text-gray-700 mb-1">Password</label>
+        <input type="password" id="password" name="password" required
+               class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-300" />
+      </div>
+
+      <button type="submit"
+              class="w-full py-2 px-4 bg-orange-600 text-white font-semibold rounded-lg hover:bg-orange-700 transition duration-300">
+        Login
+      </button>
+    </form>
+  </div>
+</body>
 </html>

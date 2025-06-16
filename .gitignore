@@ -3,3 +3,6 @@ __pycache__/
 .env
 *.log
 cookies.json
+__init__.py 
+alembic.ini 
+script.py.mako

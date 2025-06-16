@@ -6,7 +6,6 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
-
   <title>Navbar ulasCheck</title>
   <style>
     body {
@@ -44,31 +43,68 @@
           <a href="/about-us" class="text-white font-medium hover:text-yellow-200 transition duration-300">About Us</a>
         </div>
 
-        <!-- Login Button -->
-        <div class="hidden md:block">
+        <!-- Login / Username Dropdown -->
+        <div class="hidden md:block relative">
+          {% if current_user %}
+          <div class="relative inline-block text-left">
+            <button id="userDropdownButton" class="bg-white text-orange-600 font-semibold px-4 py-2 rounded-lg shadow hover:bg-yellow-100 hover:text-orange-700 transition duration-300">
+              {{ current_user.username }}
+            </button>
+            <div id="userDropdown" class="hidden absolute right-0 mt-2 w-40 bg-white rounded-md shadow-lg py-2 z-20">
+              <a href="{{ url_for('main.adminDashboard') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                Dashboard Admin
+              </a>
+              <div class="border-t my-2"></div>
+              <a href="{{ url_for('main.logout') }}" class="block px-4 py-2 text-sm text-red-600 hover:bg-red-100 font-medium">
+                Logout
+              </a>
+                        </div>
+          </div>
+          {% else %}
           <a href="/login"
             class="bg-white text-orange-600 font-semibold px-4 py-2 rounded-lg shadow hover:bg-yellow-100 hover:text-orange-700 transition duration-300">
             Login
           </a>
+          {% endif %}
         </div>
       </div>
     </div>
 
-    <!-- Mobile Menu (hidden by default) -->
+    <!-- Mobile Menu -->
     <div id="mobile-menu" class="hidden md:hidden px-4 pb-4">
       <a href="/" class="block text-white py-2 font-medium hover:text-yellow-200">Home</a>
       <a href="/about-us" class="block text-white py-2 font-medium hover:text-yellow-200">About Us</a>
-      <a href="/login" class="block w-full text-center mt-2 bg-white text-orange-600 font-semibold px-4 py-2 rounded-lg shadow hover:bg-yellow-100 hover:text-orange-700 transition duration-300">Login </a>
+      {% if current_user %}
+        <a href="{{ url_for('main.logout') }}" class="block text-white py-2 font-medium hover:text-yellow-200">Logout</a>
+      {% else %}
+        <a href="/login" class="block w-full text-center mt-2 bg-white text-orange-600 font-semibold px-4 py-2 rounded-lg shadow hover:bg-yellow-100 hover:text-orange-700 transition duration-300">Login</a>
+      {% endif %}
     </div>
   </nav>
 
+  <!-- Script Dropdown -->
   <script>
     const btn = document.getElementById('mobile-menu-button');
     const menu = document.getElementById('mobile-menu');
-
     btn.addEventListener('click', () => {
       menu.classList.toggle('hidden');
     });
+
+    const userBtn = document.getElementById('userDropdownButton');
+    const dropdown = document.getElementById('userDropdown');
+
+    if (userBtn) {
+      userBtn.addEventListener('click', () => {
+        dropdown.classList.toggle('hidden');
+      });
+
+      // Optional: close dropdown when clicking outside
+      window.addEventListener('click', function(e) {
+        if (!userBtn.contains(e.target) && !dropdown.contains(e.target)) {
+          dropdown.classList.add('hidden');
+        }
+      });
+    }
   </script>
 
 </body>

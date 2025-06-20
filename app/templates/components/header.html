@@ -3,7 +3,7 @@
 <header class="bg-white shadow p-4 flex justify-between items-center font-poppins">
     <div class="ml-auto">
         {% if current_user %}
-            <span class="text-gray-600">Halo, {{ current_user.username }}</span>
+            <span class="text-gray-600">Halo, {{ current_user.username|capitalize }}</span>
         {% else %}
             <span class="text-gray-600">Halo, Admin</span>
         {% endif %}

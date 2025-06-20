@@ -9,7 +9,7 @@
     <div class="max-w-2xl mx-auto bg-white p-8 rounded-2xl shadow-xl">
       <body class="font-[Poppins]">
       <h1 class="text-3xl font-bold text-orange-800 mb-6 text-center">Analisis Ulasan Toko Shopee</h1>
-        <form method="POST" class="space-y-4">
+        <!-- <form method="POST" class="space-y-4">
           <div>
             <label for="link" class="block text-gray-700 font-medium mb-1">Link Toko Shopee</label>
             <input
@@ -27,6 +27,23 @@
             class="w-full flex items-center justify-center gap-2 py-3 bg-orange-600 text-white text-lg font-semibold rounded-lg hover:bg-orange-700 transition duration-300"
           >
             🔍 Analisis Sekarang
+          </button>
+        </form> -->
+        <form method="POST" class="space-y-4">
+          <label for="link" class="block text-gray-700">Link Toko Shopee</label>
+          <input
+            type="text"
+            name="link"
+            id="link"
+            class="w-full border border-gray-300 rounded-lg px-4 py-2"
+            placeholder="https://shopee.co.id/buyer/55457213/rating?shop_id=55455789"
+            required
+          />
+          <button
+            type="submit"
+            class="w-full bg-orange-600 hover:bg-orange-700 text-white py-2 rounded-lg"
+          >
+            Analisis Sekarang
           </button>
         </form>
 

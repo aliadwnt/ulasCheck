@@ -1,14 +1,20 @@
 from flask import Blueprint, render_template, request, redirect, url_for, session, flash
 from werkzeug.security import check_password_hash
-from scraping.scrapingAll import shopee
-from utils.ml import analyze_data
+from scraping.scrapeReviews import scrape_reviews
 from datetime import datetime
 import pandas as pd
-from app.models.Usermodel import User
+from app.models.userModel import User
 from app.extensions import db
-from app.models.Usermodel import User
+from app.analyze import analyze_data
+import pandas as pd
+import os
+import uuid
 
 main = Blueprint("main", __name__)
+
+@main.route("/index")
+def index():
+    return "Hello dari Blueprint!"
 
 @main.app_context_processor
 def inject_now():
@@ -32,17 +38,13 @@ def dashboard_public():
     if request.method == "POST":
         link = request.form.get("link")
         if link:
-            cookies_path = "cookies.json"
-            df = shopee(link, cookies_path)
-
-            if df is not None and not df.empty:
-                csv_path = "scraping-result/datasetNew.csv"
-                df.to_csv(csv_path, index=False)
-
+            csv_path, msg = scrape_reviews(link, "cookies.json")
+            if csv_path:
                 result = analyze_data(csv_path)
+                df = pd.read_csv(csv_path)
                 data_preview = df.head(5).to_dict(orient="records")
             else:
-                flash("Gagal mengambil data dari toko Shopee.", "error")
+                flash(msg, "error")
 
     return render_template("pages/public/dashboard.html", result=result, data_preview=data_preview)
 

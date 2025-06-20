@@ -2,7 +2,6 @@ venv/
 __pycache__/
 .env
 *.log
-cookies.json
-__init__.py 
+cookies
 alembic.ini 
 script.py.mako

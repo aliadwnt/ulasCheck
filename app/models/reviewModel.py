@@ -1,9 +1,10 @@
 from app import db
-from datetime import datetime
+
 class Review(db.Model):
-    __tablename__ = 'review'
+    __tablename__ = "review"
     id = db.Column(db.Integer, primary_key=True)
-    shop_id = db.Column(db.String(50), nullable=False)
-    filename = db.Column(db.String(255), nullable=False)
-    file_data = db.Column(db.LargeBinary, nullable=False)
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    shop_id = db.Column(db.String(255))
+    file = db.Column(db.String(255))
+    created_at = db.Column(db.DateTime, default=db.func.now())
+
+    datasets = db.relationship("Dataset", backref="review", cascade="all, delete-orphan", lazy=True)

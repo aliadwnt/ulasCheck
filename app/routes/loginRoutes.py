@@ -1,29 +1,8 @@
-from flask import Blueprint, render_template, request, redirect, url_for, flash, session
-from app.models.userModel import User
+from flask import Blueprint
+from app.controllers import loginController
 
 main = Blueprint("main", __name__)
 
-@main.route("/login", methods=["GET"])
-def login_page():
-    return render_template("pages/login.html")
-
-@main.route("/login", methods=["POST"])
-def login_submit():
-    username = request.form.get("username")
-    password = request.form.get("password")
-
-    user = User.query.filter_by(username=username).first()
-
-    if user and user.check_password(password):
-        session["user_id"] = user.id  
-        flash("Login berhasil!", "success")
-        return redirect(url_for("main.adminDashboard"))
-    else:
-        flash("Username atau password salah.", "error")
-        return redirect(url_for("main.login_page"))
-
-@main.route("/logout")
-def logout():
-    session.pop("user_id", None)
-    flash("Berhasil logout.", "success")
-    return redirect(url_for("main.login_page"))
+main.add_url_rule("/login", view_func=loginController.login_page, methods=["GET"])
+main.add_url_rule("/login", view_func=loginController.login_submit, methods=["POST"])
+main.add_url_rule("/logout", view_func=loginController.logout)

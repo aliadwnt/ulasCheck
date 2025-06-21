@@ -1,38 +1,10 @@
-from flask import Blueprint, render_template, session, redirect, url_for, flash
+from flask import Blueprint
+from app.controllers import adminController
 
 admin = Blueprint("admin", __name__)
 
-@admin.route("/dashboard")
-def dashboard():
-    if "user_id" not in session:
-        flash("Silakan login dulu.", "error")
-        return redirect(url_for("main.login_page"))
-    return render_template("pages/admin/dashboard.html")
-
-@admin.route("/admin/dashboard")
-def adminDashboard():
-    if "user_id" not in session:
-        flash("Silakan login terlebih dahulu.", "error")
-        return redirect(url_for("main.login_page"))
-    return render_template("pages/admin/dashboard.html")
-
-@admin.route("/admin/dataset")
-def adminDataset():
-    if "user_id" not in session:
-        flash("Silakan login terlebih dahulu.", "error")
-        return redirect(url_for("main.login_page"))
-    return render_template("pages/admin/dataset.html")
-
-@admin.route("/admin/evaluation")
-def adminEvaluation():
-    if "user_id" not in session:
-        flash("Silakan login terlebih dahulu.", "error")
-        return redirect(url_for("main.login_page"))
-    return render_template("pages/admin/evaluation.html")
-
-@admin.route("/admin/history")
-def adminHistory():
-    if "user_id" not in session:
-        flash("Silakan login terlebih dahulu.", "error")
-        return redirect(url_for("main.login_page"))
-    return render_template("pages/admin/history.html")
+admin.add_url_rule("/dashboard", view_func=adminController.dashboard)
+admin.add_url_rule("/admin/dashboard", view_func=adminController.admin_dashboard)
+admin.add_url_rule("/admin/dataset", view_func=adminController.admin_dataset)
+admin.add_url_rule("/admin/evaluation", view_func=adminController.admin_evaluation)
+admin.add_url_rule("/admin/history", view_func=adminController.admin_history)

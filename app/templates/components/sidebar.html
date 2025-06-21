@@ -15,26 +15,26 @@
     <!-- Menu Items -->
     <ul class="space-y-2">
       <li>
-        <a href="{{ url_for('main.adminDashboard') }}"
-           class="block py-2 px-4 rounded-md hover:bg-orange-700 {% if request.endpoint == 'main.adminDashboard' %} bg-orange-700 {% endif %}">
+        <a href="{{ url_for('admin.admin_dashboard') }}"
+           class="block py-2 px-4 rounded-md hover:bg-orange-700 {% if request.endpoint == 'admin.admin_dashboard' %} bg-orange-700 {% endif %}">
           Dashboard
         </a>
       </li>
       <li>
-        <a href="{{ url_for('main.adminHistory') }}"
-           class="block py-2 px-4 rounded-md hover:bg-orange-700 {% if request.endpoint == 'main.adminHistory' %} bg-orange-700 {% endif %}">
+        <a href="{{ url_for('admin.admin_history') }}"
+           class="block py-2 px-4 rounded-md hover:bg-orange-700 {% if request.endpoint == 'admin.admin_history' %} bg-orange-700 {% endif %}">
           History
         </a>
       </li>
       <li>
-        <a href="{{ url_for('main.adminDataset') }}"
-           class="block py-2 px-4 rounded-md hover:bg-orange-700 {% if request.endpoint == 'main.adminDataset' %} bg-orange-700 {% endif %}">
+        <a href="{{ url_for('admin.admin_dataset') }}"
+           class="block py-2 px-4 rounded-md hover:bg-orange-700 {% if request.endpoint == 'admin.admin_dataset' %} bg-orange-700 {% endif %}">
           Dataset
         </a>
       </li>
       <li>
-        <a href="{{ url_for('main.adminEvaluation') }}"
-           class="block py-2 px-4 rounded-md hover:bg-orange-700 {% if request.endpoint == 'main.adminEvaluation' %} bg-orange-700 {% endif %}">
+        <a href="{{ url_for('admin.admin_evaluation') }}"
+           class="block py-2 px-4 rounded-md hover:bg-orange-700 {% if request.endpoint == 'admin.admin_evaluation' %} bg-orange-700 {% endif %}">
           Evaluation
         </a>
       </li>

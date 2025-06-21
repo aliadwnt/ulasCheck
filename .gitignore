@@ -5,3 +5,4 @@ __pycache__/
 cookies
 alembic.ini 
 script.py.mako
+scraping-result

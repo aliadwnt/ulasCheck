@@ -12,11 +12,6 @@ def admin_dashboard():
         return redirect(url_for("main.login_page"))
     return render_template("pages/admin/dashboard.html")
 
-def admin_dataset():
-    if "user_id" not in session:
-        flash("Silakan login terlebih dahulu.", "error")
-        return redirect(url_for("main.login_page"))
-    return render_template("pages/admin/dataset.html")
 
 def admin_evaluation():
     if "user_id" not in session:

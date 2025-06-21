@@ -1,6 +1,6 @@
 from flask import Flask
 from config import SQLALCHEMY_DATABASE_URI
-from app.extensions import db, migrate, socketio  # hanya import, jangan bikin ulang
+from app.extensions import db, migrate, socketio
 
 def create_app():
     app = Flask(__name__)
@@ -14,11 +14,13 @@ def create_app():
     # Register semua blueprint
     from app.routes.loginRoutes import main      
     from app.routes.adminRoutes import admin      
-    from app.routes.publicRoutes import public    
+    from app.routes.publicRoutes import public
+    from app.routes.reviewRoutes import review    
 
     app.register_blueprint(main)    
     app.register_blueprint(admin)  
-    app.register_blueprint(public)  
+    app.register_blueprint(public)
+    app.register_blueprint(review)
 
     # Import semua model agar dikenali oleh migrasi
     from app.models import userModel, reviewModel, predictionModel, evaluationModel, datasetModel

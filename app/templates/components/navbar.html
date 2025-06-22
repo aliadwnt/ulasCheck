@@ -71,15 +71,43 @@
     </div>
 
     <!-- Mobile Menu -->
-    <div id="mobile-menu" class="hidden md:hidden px-4 pb-4">
-      <a href="/" class="block text-white py-2 font-medium hover:text-yellow-200">Home</a>
-      <a href="/about-us" class="block text-white py-2 font-medium hover:text-yellow-200">About Us</a>
-      {% if current_user %}
-        <a href="{{ url_for('main.logout') }}" class="block text-white py-2 font-medium hover:text-yellow-200">Logout</a>
-      {% else %}
-        <a href="/login" class="block w-full text-center mt-2 bg-white text-orange-600 font-semibold px-4 py-2 rounded-lg shadow hover:bg-yellow-100 hover:text-orange-700 transition duration-300">Login</a>
-      {% endif %}
-    </div>
+   <div id="mobile-menu" class="hidden md:hidden px-4 pb-4">
+  <!-- Link Umum -->
+  <a href="/" class="block text-white py-2 font-medium hover:text-yellow-200">Home</a>
+  <a href="/about-us" class="block text-white py-2 font-medium hover:text-yellow-200">About Us</a>
+
+  {% if current_user %}
+    <!-- Divider -->
+    <div class="border-t border-orange-300 my-3"></div>
+
+      <!-- Link Admin -->
+      <div class="bg-white rounded-md shadow p-2 space-y-2">
+        <a href="{{ url_for('admin.admin_dashboard') }}"
+          class="flex items-center text-orange-600 font-semibold hover:text-orange-700 transition">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M3 7h18M3 12h18M3 17h18" />
+          </svg>
+          Dashboard Admin
+        </a>
+
+        <a href="{{ url_for('main.logout') }}"
+          class="flex items-center text-red-600 font-medium hover:text-red-700 transition">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1m0-10V5" />
+          </svg>
+          Logout
+        </a>
+      </div>
+    {% else %}
+      <!-- Login Button -->
+      <a href="/login"
+        class="block w-full text-center mt-4 bg-white text-orange-600 font-semibold px-4 py-2 rounded-lg shadow hover:bg-yellow-100 hover:text-orange-700 transition duration-300">
+        Login
+      </a>
+    {% endif %}
+  </div>
   </nav>
 
   <!-- Script Dropdown -->

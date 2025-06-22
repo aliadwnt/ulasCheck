@@ -3,138 +3,315 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>{% block title %}ulasCheck Admin{% endblock %}</title>
-
-  <!-- Tailwind CDN -->
+  <title>{% block title %}Dataset Review{% endblock %}</title>
   <script src="https://cdn.tailwindcss.com"></script>
-
-  <!-- Google Fonts: Poppins -->
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet" />
-
   <style>
-    body {
-      font-family: 'Poppins', sans-serif;
-    }
+    body { font-family: 'Poppins', sans-serif; }
   </style>
 </head>
 <body class="bg-gray-100 min-h-screen flex">
-
   {% include 'components/sidebar.html' %}
-
   <div class="flex-1 p-6">
     {% include 'components/header.html' %}
+
     <main class="mt-6">
       {% block content %}
-      <div class="bg-white shadow rounded-lg p-6 mb-3">
-        <h1 class="text-2xl font-semibold text-gray-800 mb-4">Dataset</h1>
-
-        <!-- Dropdown Filter -->
-        <div class="mb-4">
-          <label for="shopFilter" class="block text-sm font-medium text-gray-700 mb-1">Filter ID Toko:</label>
-          <select id="shopFilter" class="w-full md:w-1/3 border-gray-300 rounded-md shadow-sm focus:ring-orange-500 focus:border-orange-500 text-sm">
-            <option value="all">Semua Toko</option>
-            {% for shop in reviews|map(attribute='shop_id')|unique %}
-            <option value="{{ shop }}">{{ shop }}</option>
-            {% endfor %}
-          </select>
+      <div class="bg-white p-6 rounded-lg shadow mb-6">
+       <div class="flex flex-col md:flex-row md:justify-between md:items-center gap-3 mb-4">
+        <h1 class="text-2xl font-semibold text-gray-800">Dataset Review</h1>
+      <div class="flex flex-col sm:flex-row sm:justify-end sm:items-center gap-2 w-full sm:w-auto">
+        <!-- Search -->
+        <div class="relative w-full sm:w-64">
+          <input type="text" id="searchInput"
+            placeholder="Cari username, review, atau rating..."
+            class="w-full pr-10 pl-4 py-2 border rounded shadow-sm focus:outline-none focus:ring-2 focus:ring-orange-500"
+          >
+          <span class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none text-gray-400">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M21 21l-4.35-4.35M11 18a7 7 0 100-14 7 7 0 000 14z" />
+            </svg>
+          </span>
         </div>
 
+        <select id="ratingFilter"
+          class="px-3 py-2 border rounded shadow-sm focus:outline-none focus:ring-2 focus:ring-orange-500 text-sm w-full sm:w-auto">
+          <option value="">Semua Rating</option>
+          <option value="5">5 Bintang</option>
+          <option value="4">4 Bintang</option>
+          <option value="3">3 Bintang</option>
+          <option value="2">2 Bintang</option>
+          <option value="1">1 Bintang</option>
+        </select>
+
+        <!-- Train Data -->
+        <button onclick="trainData()" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 text-sm flex items-center gap-2">
+          <span class="text-white font-bold">&#8635;</span>
+          Train Data
+        </button>
+
+        <!-- Tambah Data -->
+        <button onclick="openAddModal()" class="bg-orange-600 text-white px-4 py-2 rounded hover:bg-orange-700 text-sm flex items-center gap-2">
+          + Tambah Data
+        </button>
+      </div>
+</div>
         <div class="overflow-x-auto">
           <table class="min-w-full table-auto text-sm border-collapse">
-            <thead>
-              <tr class="bg-gray-200 text-sm font-semibold text-gray-700">
+            <thead class="bg-gray-200 text-gray-700 font-semibold">
+              <tr>
                 <th class="border px-4 py-2">No</th>
-                <th class="border px-4 py-2">ID Toko</th>
-                <th class="border px-4 py-2">File Ulasan</th>
-                <th class="border px-4 py-2">Tanggal Analisis</th>
+                <th class="border px-4 py-2">Username</th>
+                <th class="border px-4 py-2">Produk</th>
+                <th class="border px-4 py-2">Review</th>
+                <th class="border px-4 py-2">Rating</th>
+                <th class="border px-4 py-2">Tanggal Review</th>
+                <th class="border px-4 py-2">Aksi</th>
               </tr>
             </thead>
             <tbody id="tableBody">
-              {% for review in reviews %}
-              <tr class="text-center" data-shop-id="{{ review.shop_id }}">
+              {% for row in dataset %}
+              <tr class="text-center">
                 <td class="border px-4 py-2">{{ loop.index }}</td>
-                <td class="border px-4 py-2">{{ review.shop_id }}</td>
-                <td class="border px-4 py-2 text-center">
-                  <a href="{{ url_for('review.download_file', id=review.id) }}"
-                    class="text-blue-600 hover:text-blue-800 font-medium"
-                    title="Unduh file">
-                    💾 Download
-                  </a>
+                <td class="border px-4 py-2">{{ row.username | truncate(15, True, '...') }}</td>
+                <td class="border px-4 py-2">{{ row.product | truncate(15, True, '...') }}</td>
+                <td class="border px-4 py-2 text-left">{{ row.review | truncate(15, True, '...') }}</td>
+                <td class="border px-4 py-2 ">&#9733; {{ row.rating }}</td>
+                <td class="border px-4 py-2">{{ row.reviewAt }}</td>
+                <td class="border px-4 py-2">
+                  <div class="flex flex-wrap justify-center items-center gap-2">
+                    <button
+                      onclick="openEditModal('{{ row.id }}', '{{ row.username }}', '{{ row.product }}', `{{ row.review }}`, '{{ row.rating }}', '{{ row.reviewAt }}')"
+                      class="bg-yellow-400 text-white px-2 py-1 rounded text-xs hover:bg-yellow-500 flex items-center gap-1"
+                      title="Edit"
+                    >
+                      <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                          d="M15.232 5.232l3.536 3.536M9 13l6-6m2-2a2.828 2.828 0 114 4L9 21H5v-4L17.232 5.232z" />
+                      </svg>
+                    </button>
+
+                    <!-- Tombol Hapus -->
+                    <button
+                      onclick="deleteData('{{ row.id }}')"
+                      class="bg-red-500 text-white px-2 py-1 rounded text-xs hover:bg-red-600 flex items-center gap-1"
+                      title="Hapus"
+                    >
+                      <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                          d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6M9 7h6m2 0a2 2 0 00-2-2H9a2 2 0 00-2 2h10z" />
+                      </svg>
+                    </button>
+                  </div>
                 </td>
-                <td class="border px-4 py-2">{{ review.created_at.strftime('%H:%M - %d %B %Y') }}</td>
               </tr>
               {% endfor %}
             </tbody>
           </table>
-          <div id="pagination" class="mt-4 flex justify-end items-center space-x-2 text-sm text-orange-800 font-medium"></div>
+         <div id="pagination" class="mt-4 flex justify-end items-center space-x-1 text-sm font-medium"></div>
+      </div>
+
+      <!-- Modal Form -->
+      <div id="modalForm" class="fixed inset-0 hidden bg-black bg-opacity-50 items-center justify-center z-50">
+        <div class="bg-white p-6 rounded-lg w-full max-w-md relative">
+          <h2 id="modalTitle" class="text-xl font-bold mb-4">Tambah Data</h2>
+          <form id="formDataset">
+            <input type="hidden" name="id" id="datasetId">
+            <div class="mb-3">
+              <label class="block text-sm font-medium">Username</label>
+              <input type="text" name="username" id="username" class="w-full border px-3 py-2 rounded" required>
+            </div>
+            <div class="mb-3">
+              <label class="block text-sm font-medium">Produk</label>
+              <input type="text" name="product" id="product" class="w-full border px-3 py-2 rounded" required>
+            </div>
+            <div class="mb-3">
+              <label class="block text-sm font-medium">Review</label>
+              <textarea name="review" id="review" class="w-full border px-3 py-2 rounded" required></textarea>
+            </div>
+            <div class="mb-3">
+              <label class="block text-sm font-medium">Rating</label>
+              <input type="number" name="rating" id="rating" class="w-full border px-3 py-2 rounded" min="1" max="5" required>
+            </div>
+            <div class="mb-4">
+              <label class="block text-sm font-medium">Tanggal Review</label>
+              <input type="date" name="reviewAt" id="reviewAt" class="w-full border px-3 py-2 rounded" required>
+            </div>
+            <div class="flex justify-end space-x-2">
+              <button type="button" onclick="closeModal()" class="px-4 py-2 bg-gray-300 rounded">Batal</button>
+              <button type="submit" class="px-4 py-2 bg-orange-600 text-white rounded hover:bg-orange-700">Simpan</button>
+            </div>
+          </form>
+          <button onclick="closeModal()" class="absolute top-2 right-3 text-gray-600 hover:text-red-500 text-xl">×</button>
         </div>
       </div>
       {% endblock %}
     </main>
   </div>
 
-  <!-- JavaScript untuk filter dan pagination -->
-  <script>
-    document.addEventListener("DOMContentLoaded", function () {
-      const filter = document.getElementById("shopFilter");
-      const rows = document.querySelectorAll("#tableBody tr");
-      const pagination = document.getElementById("pagination");
+    <script>
+      // Fungsi membuka modal tambah data
+      function openAddModal() {
+        document.getElementById("modalTitle").textContent = "Tambah Data";
+        document.getElementById("formDataset").reset();
+        document.getElementById("datasetId").value = "";
+        document.getElementById("modalForm").classList.remove("hidden");
+        document.getElementById("modalForm").classList.add("flex");
+      }
 
-      let filteredRows = Array.from(rows);
+      // Fungsi membuka modal edit data
+      function openEditModal(id, username, product, review, rating, reviewAt) {
+        document.getElementById("modalTitle").textContent = "Edit Data";
+        document.getElementById("datasetId").value = id;
+        document.getElementById("username").value = username;
+        document.getElementById("product").value = product;
+        document.getElementById("review").value = review;
+        document.getElementById("rating").value = rating;
+        document.getElementById("reviewAt").value = reviewAt;
+        document.getElementById("modalForm").classList.remove("hidden");
+        document.getElementById("modalForm").classList.add("flex");
+      }
+
+      // Fungsi menutup modal
+      function closeModal() {
+        document.getElementById("modalForm").classList.add("hidden");
+        document.getElementById("modalForm").classList.remove("flex");
+      }
+
+      // Submit form dengan AJAX (POST ke /add atau /edit)
+      document.getElementById("formDataset").addEventListener("submit", async function (e) {
+        e.preventDefault();
+        const formData = new FormData(this);
+        const id = formData.get("id");
+        const url = id ? `/admin/dataset/edit/${id}` : `/admin/dataset/add`;
+
+        try {
+          await fetch(url, {
+            method: "POST",
+            body: formData,
+          });
+          location.reload();
+        } catch (err) {
+          alert("Gagal menyimpan data.");
+        }
+      });
+
+      // Hapus data
+      async function deleteData(id) {
+        if (!confirm("Yakin ingin menghapus data ini?")) return;
+        try {
+          await fetch(`/admin/dataset/delete/${id}`, {
+            method: "POST",
+          });
+          location.reload();
+        } catch (err) {
+          alert("Gagal menghapus data.");
+        }
+      }
+
+      // Fungsi filter gabungan (search + rating)
+      function applyFilters() {
+        const keyword = document.getElementById("searchInput").value.toLowerCase();
+        const selectedRating = document.getElementById("ratingFilter").value;
+        const rows = document.querySelectorAll("#tableBody tr");
+
+        rows.forEach(row => {
+          const username = row.children[1]?.textContent.toLowerCase() || "";
+          const review = row.children[3]?.textContent.toLowerCase() || "";
+          const rating = row.children[4]?.textContent.replace("★", "").trim();
+
+          const matchKeyword =
+            username.includes(keyword) || review.includes(keyword) || rating.includes(keyword);
+          const matchRating = selectedRating === "" || rating === selectedRating;
+
+          row.style.display = matchKeyword && matchRating ? "" : "none";
+        });
+      }
+
+      // Event listener
+      document.getElementById("searchInput").addEventListener("input", applyFilters);
+      document.getElementById("ratingFilter").addEventListener("change", applyFilters);
+
+
+      // ✅ Pagination
+      document.addEventListener("DOMContentLoaded", function () {
+      const rows = document.querySelectorAll("#tableBody tr");
       const rowsPerPage = 5;
+      const pageCount = Math.ceil(rows.length / rowsPerPage);
+      const pagination = document.getElementById("pagination");
       let currentPage = 1;
 
-      function displayPage(page, dataRows) {
+      function displayPage(page) {
         const start = (page - 1) * rowsPerPage;
         const end = start + rowsPerPage;
 
-        rows.forEach(row => row.style.display = "none");
-        dataRows.slice(start, end).forEach(row => row.style.display = "");
+        rows.forEach((row, index) => {
+          row.style.display = index >= start && index < end ? "" : "none";
+        });
 
-        renderPagination(dataRows, page);
+        renderPagination(page);
       }
 
-      function renderPagination(dataRows, activePage) {
+      function renderPagination(activePage) {
         pagination.innerHTML = "";
-        const pageCount = Math.ceil(dataRows.length / rowsPerPage);
 
-        if (pageCount <= 1) return;
-
-        const maxPagesToShow = 5;
+        const pagesToShow = 5;
         let startPage = Math.max(1, activePage - 2);
-        let endPage = Math.min(startPage + maxPagesToShow - 1, pageCount);
+        let endPage = Math.min(startPage + pagesToShow - 1, pageCount);
 
-        if (endPage - startPage < maxPagesToShow - 1) {
-          startPage = Math.max(1, endPage - maxPagesToShow + 1);
+        if (endPage - startPage < pagesToShow - 1) {
+          startPage = Math.max(1, endPage - pagesToShow + 1);
         }
 
         for (let i = startPage; i <= endPage; i++) {
-          const btn = document.createElement("button");
-          btn.textContent = i;
-          btn.className = `px-2 ${i === activePage ? 'underline font-bold' : 'hover:underline'}`;
-          btn.addEventListener("click", () => {
-            currentPage = i;
-            displayPage(currentPage, filteredRows);
-          });
+          const btn = createPageButton(i, i);
+          btn.className += (i === activePage)
+            ? " underline underline-offset-4 font-semibold"
+            : " hover:underline";
           pagination.appendChild(btn);
+        }
+
+        if (endPage < pageCount) {
+          const dots = document.createElement("span");
+          dots.textContent = "...";
+          dots.className = "mx-1 text-gray-500";
+          pagination.appendChild(dots);
+
+          const nextBtn = createPageButton(">", activePage + 1);
+          nextBtn.classList.add("hover:font-bold");
+          pagination.appendChild(nextBtn);
+        }
+
+        if (startPage > 1) {
+          const prevBtn = createPageButton("<", activePage - 1);
+          prevBtn.classList.add("hover:font-bold", "mr-2");
+          pagination.prepend(prevBtn);
+
+          const dots = document.createElement("span");
+          dots.textContent = "...";
+          dots.className = "mx-1 text-gray-500";
+          pagination.prepend(dots);
         }
       }
 
-      filter.addEventListener("change", function () {
-        const selected = this.value;
-        currentPage = 1;
+      function createPageButton(text, page) {
+        const btn = document.createElement("button");
+        btn.textContent = text;
+        btn.className = "px-2 text-orange-800";
+        btn.onclick = () => {
+          if (typeof page === "number" && page >= 1 && page <= pageCount) {
+            currentPage = page;
+            displayPage(currentPage);
+          }
+        };
+        return btn;
+      }
 
-        filteredRows = Array.from(rows).filter(row => {
-          const shopId = row.getAttribute("data-shop-id");
-          return selected === "all" || shopId === selected;
-        });
-
-        displayPage(currentPage, filteredRows);
-      });
-
-      displayPage(currentPage, filteredRows);
+      if (rows.length > 0) {
+        displayPage(currentPage);
+      }
     });
-  </script>
-
-</body>
+    </script>
+  </body>
 </html>

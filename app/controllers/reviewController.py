@@ -1,12 +1,13 @@
-from flask import render_template, flash, redirect, send_file, request, session, url_for, jsonify
+from flask import render_template, abort, flash, redirect, send_file, request, session, url_for, jsonify
 from app.models.reviewModel import Review
+import pandas as pd
 from app import db
-import io
+import io, pytz
 from datetime import datetime
 
 # ✅ Tampilkan semua riwayat review
 def show_reviews():
-    reviews = Review.query.order_by(Review.created_at.desc()).all()
+    reviews = Review.query.order_by(Review.updatedAt.desc()).all()
     return render_template("pages/admin/history.html", reviews=reviews)
 
 # ✅ Download file review sebagai CSV
@@ -51,23 +52,28 @@ def add_review():
     file = request.files.get("file")
 
     if not shop_id or not file:
-        return jsonify(success=False, message="Semua field wajib diisi!")
+        return jsonify(success=False, message="ID Toko dan File wajib diisi."), 400
+
+    # Gunakan timezone Jakarta
+    wib = pytz.timezone("Asia/Jakarta")
+    now = datetime.now(wib)
+
+    review = Review(
+        shop_id=shop_id,
+        file=file.filename,
+        file_data=file.read(),
+        createdAt=now,
+        updatedAt=now
+    )
 
     try:
-        file_data = file.read()
-        review = Review(
-            shop_id=shop_id,
-            file=file.filename,
-            file_data=file_data,
-            created_at=datetime.now()
-        )
         db.session.add(review)
         db.session.commit()
-        return jsonify(success=True, message="✅ Review berhasil ditambahkan!")
+        return jsonify(success=True, message="Review berhasil ditambahkan!")
     except Exception as e:
         db.session.rollback()
-        return jsonify(success=False, message=f"Gagal menambahkan review: {e}")
-
+        return jsonify(success=False, message=f"Gagal menambahkan review: {e}"), 500
+    
 # ✅ Edit review via AJAX
 def edit_review(id):
     review = Review.query.get_or_404(id)
@@ -79,6 +85,9 @@ def edit_review(id):
     if file:
         review.file = file.filename
         review.file_data = file.read()
+
+    wib = pytz.timezone('Asia/Jakarta')
+    review.updatedAt = datetime.now(wib)
 
     try:
         db.session.commit()

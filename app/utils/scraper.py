@@ -90,7 +90,7 @@ def shopee(url, cookies_json):
         db.session.query(func.count(Review.id))
         .filter(
             Review.shop_id == shop_id,
-            func.date(Review.created_at) == datetime.now().date()
+            func.date(Review.createdAt) == datetime.now().date()
         )
         .scalar()
     )

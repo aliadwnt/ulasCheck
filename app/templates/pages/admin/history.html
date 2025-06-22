@@ -20,18 +20,29 @@
             {% block content %}
             <div class="bg-white shadow rounded-lg p-6 mb-3">
                 <h1 class="text-2xl font-semibold text-gray-800 mb-4">Data Riwayat Analisis</h1>
-                <div class="mb-4 flex justify-start">
-                   <a href="#"
+              <div class="mb-4 flex flex-col sm:flex-row sm:items-center sm:justify-end gap-2">
+                <div class="relative w-full sm:w-1/3">
+                    <input type="text" id="searchInput"
+                    placeholder="Cari ID Toko..."
+                    class="w-full pr-10 pl-4 py-2 border rounded shadow-sm focus:outline-none focus:ring-2 focus:ring-orange-500"
+                    >
+                    <span class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none text-gray-400">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M21 21l-4.35-4.35M11 18a7 7 0 100-14 7 7 0 000 14z" />
+                    </svg>
+                    </span>
+                </div>
+
+                <a href="#"
                     onclick="openModal()"
                     class="bg-orange-600 text-white px-4 py-2 rounded shadow hover:bg-orange-700 transition text-sm flex items-center gap-2">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M12 4v16m8-8H4" />
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
                     </svg>
                     Tambah Data
-                    </a>
+                </a>
                 </div>
-
                     <div class="overflow-x-auto mt-4">
                         <table class="min-w-full table-auto text-sm border-collapse">
                             <thead>
@@ -39,7 +50,8 @@
                                 <th class="border px-4 py-2">No</th>
                                 <th class="border px-4 py-2">ID Toko</th>
                                 <th class="border px-4 py-2">File Ulasan</th>
-                                <th class="border px-4 py-2">Tanggal Scraping</th>
+                                <th class="border px-4 py-2">Created At</th>
+                                <th class="border px-4 py-2">Update At</th>
                                 <th class="border px-4 py-2">Aksi</th>
                             </tr>
                             </thead>
@@ -48,18 +60,29 @@
                             <tr class="text-center">
                                 <td class="border px-4 py-2">{{ loop.index }}</td>
                                 <td class="border px-4 py-2">{{ review.shop_id }}</td>
-                                <td class="border px-4 py-2">
-                               <a href="{{ url_for('review.download_file', id=review.id) }}"
-                                class="text-blue-600 hover:text-blue-800 font-medium flex items-center gap-1"
-                                title="Unduh file">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M4 16v2a2 2 0 002 2h12a2 2 0 002-2v-2M7 10l5 5 5-5M12 15V3" />
-                                </svg>
-                                Unduh
-                                </a>
+                                <td class="border px-4 py-2 text-center">
+                                    <a href="{{ url_for('review.download_file', id=review.id) }}"
+                                        class="text-blue-600 hover:text-blue-800 font-medium inline-flex items-center justify-center gap-1"
+                                        title="Unduh file">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M4 16v2a2 2 0 002 2h12a2 2 0 002-2v-2M7 10l5 5 5-5M12 15V3" />
+                                        </svg>
+                                        Unduh
+                                    </a>
                                 </td>
-                                <td class="border px-4 py-2">{{ review.created_at.strftime('%H:%M - %d %B %Y') }}</td>
+                                <!-- <td class="border px-4 py-2">
+                                    {{ review.createdAt.strftime('%H:%M - %d %B %Y') if review.createdAt else '-' }}
+                                </td>
+                                <td class="border px-4 py-2">
+                                    {{ review.updatedAt.strftime('%H:%M - %d %B %Y') if review.updatedAt else '-' }}
+                                </td> -->
+                                <td class="border px-4 py-2">
+                                    {{ review.createdAt}}
+                                </td>
+                                <td class="border px-4 py-2">
+                                    {{ review.updatedAt}}
+                                </td>
                                 <td class="border px-4 py-2">
                                 <div class="flex flex-wrap justify-center gap-2">
                                    
@@ -172,25 +195,40 @@
         modal.classList.remove("flex", "items-center", "justify-center");
         }
 
-    document.getElementById("reviewForm").addEventListener("submit", async function (e) {
-        e.preventDefault();
-        const form = e.target;
-        const formData = new FormData(form);
-        const id = formData.get("id");
-        const url = id ? `/admin/review/edit/${id}` : `/admin/review/add`;
+        document.getElementById("reviewForm").addEventListener("submit", async function (e) {
+            e.preventDefault();
+            const form = e.target;
+            const formData = new FormData(form);
+            const id = formData.get("id");
+            const url = id ? `/admin/review/edit/${id}` : `/admin/review/add`;
 
-        try {
-        const res = await fetch(url, {
-            method: "POST",
-            body: formData
+            try {
+            const res = await fetch(url, {
+                method: "POST",
+                body: formData
+            });
+            const text = await res.text();
+            location.reload();
+            } catch (err) {
+            alert("Gagal menyimpan data.");
+            }
         });
-        const text = await res.text();
-        location.reload();
-        } catch (err) {
-        alert("Gagal menyimpan data.");
-        }
-    });
-    
+
+        // Search filter
+        document.getElementById("searchInput").addEventListener("input", function () {
+            const keyword = this.value.toLowerCase();
+            const rows = document.querySelectorAll("#tableBody tr");
+
+            rows.forEach(row => {
+                const idToko = row.children[1].textContent.toLowerCase();
+                row.style.display = idToko.includes(keyword) ? "" : "none";
+            });
+
+            // optionally: hide pagination while searching
+            pagination.style.display = keyword ? "none" : "flex";
+        });
+
+        
         document.addEventListener("DOMContentLoaded", function () {
             const rows = document.querySelectorAll("#tableBody tr");
             const rowsPerPage = 5;

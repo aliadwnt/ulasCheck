@@ -1,3 +1,4 @@
+from datetime import datetime
 from app import db
 
 class Review(db.Model):
@@ -6,6 +7,5 @@ class Review(db.Model):
     shop_id = db.Column(db.String(255))
     file = db.Column(db.String(255))
     file_data = db.Column(db.LargeBinary)
-    created_at = db.Column(db.DateTime, default=db.func.now())
-
-    datasets = db.relationship("Dataset", backref="review", cascade="all, delete-orphan", lazy=True)
+    createdAt = db.Column(db.DateTime, default=datetime.utcnow)
+    updatedAt = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)

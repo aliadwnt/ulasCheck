@@ -47,9 +47,9 @@
         </select>
 
         <!-- Train Data -->
-        <button onclick="trainData()" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 text-sm flex items-center gap-2">
+        <button onclick="evaluateModel()" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 text-sm flex items-center gap-2">
           <span class="text-white font-bold">&#8635;</span>
-          Train Data
+          Evaluation
         </button>
 
         <!-- Tambah Data -->
@@ -209,6 +209,23 @@
           alert("Gagal menghapus data.");
         }
       }
+
+        async function evaluateModel() {
+        if (!confirm("Lakukan evaluasi model dengan dataset saat ini?")) return;
+        try {
+          const response = await fetch("/evaluation/start", {
+            method: "POST",
+          });
+          if (response.redirected) {
+            window.location.href = response.url; // Redirect ke halaman hasil evaluasi
+          } else {
+            alert("Evaluasi selesai.");
+          }
+        } catch (err) {
+          alert("Gagal melakukan evaluasi.");
+        }
+      }
+
 
       // Fungsi filter gabungan (search + rating)
       function applyFilters() {

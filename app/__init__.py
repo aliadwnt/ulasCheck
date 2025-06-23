@@ -28,7 +28,6 @@ def create_app():
     app.register_blueprint(evaluation)
     app.register_blueprint(analyze)
 
-    # Import semua model agar dikenali oleh migrasi
-    from app.models import userModel, reviewModel, predictionModel, evaluationModel, datasetModel
+    from app.models import userModel, reviewModel, evaluationModel, evaluationModel, datasetModel
 
     return app

@@ -1,60 +1,63 @@
-import json
-import os
-from flask import jsonify, render_template
-from app import db
-from app.models.evaluationModel import ModelEvaluation
+from flask import redirect, url_for, flash, render_template
+from app.models.datasetModel import Dataset
+from app.models.evaluationModel import Evaluation
+from app.analyze import clean_text, vectorizer, model
+from app.extensions import db
 
-# Fungsi render halaman evaluasi (template HTML)
-def render_evaluation_page():
-    return render_template("pages/admin/evaluation.html")
+import pandas as pd
+from datetime import datetime
+from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score
+import time
 
-# Fungsi pemrosesan model (dummy / placeholder, sesuaikan dengan real logic-mu)
-def train_model_controller():
-    # Dummy result (ganti sesuai hasil pelatihan sebenarnya)
-    dummy_result = [{
-        "model": "SVM",
-        "accuracy": 0.89,
-        "precision": 0.85,
-        "recall": 0.87,
-        "f1_score": 0.86,
-        "time_process": 2.34
-    }]
-    return jsonify({"results": dummy_result})
 
-# Fungsi menyimpan evaluasi ke database
-def save_evaluation_to_db():
-    path = "model/evaluation_summary.json"
-    if not os.path.exists(path):
-        return jsonify({"error": "evaluation_summary.json tidak ditemukan"}), 404
+def evaluate_model():
+    data = Dataset.query.all()
+    if not data:
+        flash("Tidak ada data untuk evaluasi.", "danger")
+        return redirect("/admin/dataset")
 
-    try:
-        with open(path, "r") as file:
-            data = json.load(file)
-    except Exception as e:
-        return jsonify({"error": f"Gagal membaca file JSON: {str(e)}"}), 500
+    start_time = time.time()
 
-    try:
-        new_eval = ModelEvaluation(
-            model_name=data.get("model_name"),
-            accuracy=float(data.get("accuracy", 0)),
-            precision=float(data.get("precision", 0)),
-            recall=float(data.get("recall", 0)),
-            f1_score=float(data.get("f1_score", 0)),
-            training_time=float(data.get("training_time", 0)),
-            total_review=int(data.get("total_review", 0)),
-            positif=int(data.get("positif", 0)),
-            negatif=int(data.get("negatif", 0)),
-            persen_positif=float(data.get("persen_positif", 0)),
-            label_toko=data.get("label_toko", ""),
-            aspek_tertinggi=data.get("aspek_tertinggi", ""),
-            jumlah_aspek=int(data.get("jumlah_aspek", 0)),
-            persen_aspek=float(data.get("persen_aspek", 0))
-        )
+    df = pd.DataFrame([{
+        "review": d.review,
+        "rating": d.rating
+    } for d in data])
 
-        db.session.add(new_eval)
-        db.session.commit()
-        return jsonify({"message": "✅ Evaluasi berhasil disimpan ke database!"})
+    df["clean"] = df["review"].apply(clean_text)
+    df.dropna(subset=["clean", "rating"], inplace=True)
 
-    except Exception as e:
-        db.session.rollback()
-        return jsonify({"error": f"Gagal menyimpan ke database: {str(e)}"}), 500
+    X = vectorizer.transform(df["clean"])
+    y_true = (df["rating"] >= 4).astype(int)
+    y_pred = model.predict(X)
+
+    acc = round(accuracy_score(y_true, y_pred), 4)
+    prec = round(precision_score(y_true, y_pred), 4)
+    rec = round(recall_score(y_true, y_pred), 4)
+    f1 = round(f1_score(y_true, y_pred), 4)
+
+    duration = round(time.time() - start_time, 2)
+
+    log = Evaluation(
+        model_name="SVM",
+        accuracy=acc,
+        precision=prec,
+        recall=rec,
+        f1_score=f1,
+        training_time=duration,
+        total_review=len(df),
+        positif=int((y_true == 1).sum()),
+        negatif=int((y_true == 0).sum()),
+        persen_positif=round((y_true == 1).mean() * 100, 2),
+        label_toko="Toko Direkomendasikan" if (y_true == 1).mean() >= 0.5 else "Toko Tidak Direkomendasikan",
+        evaluationAt=datetime.now()
+    )
+
+    db.session.add(log)
+    db.session.commit()
+
+    flash("Evaluasi berhasil dilakukan.", "success")
+    return redirect("/evaluation")
+
+def show_evaluation():
+    logs = Evaluation.query.order_by(Evaluation.evaluationAt.desc()).all()
+    return render_template("pages/admin/evaluation.html", logs=logs)

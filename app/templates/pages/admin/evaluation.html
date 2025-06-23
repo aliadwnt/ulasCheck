@@ -8,115 +8,108 @@
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet" />
   <style>
-    body {
-      font-family: 'Poppins', sans-serif;
-    }
+    body { font-family: 'Poppins', sans-serif; }
   </style>
 </head>
 <body class="bg-gray-100 min-h-screen">
-
-  <!-- WRAPPER FLEX: SIDEBAR + MAIN -->
   <div class="flex min-h-screen">
-    
-    <!-- SIDEBAR -->
     {% include 'components/sidebar.html' %}
-
-    <!-- MAIN CONTENT -->
     <div class="flex-1 p-6">
-      
-      <!-- HEADER -->
       {% include 'components/header.html' %}
 
-      <!-- PAGE CONTENT -->
-      <main class="flex-1 p-6 bg-gray-100">
-        <div class="bg-white p-6 rounded-lg shadow-lg max-w-5xl mx-auto">
+      <main class="p-6 bg-gray-100 space-y-12">
+        <div class="bg-white p-6 rounded-lg shadow-lg max-w-7xl mx-auto">
           <h1 class="text-2xl font-bold text-gray-800 mb-6">📊 Evaluasi Model</h1>
 
-          <!-- Tombol Aksi -->
-          <div class="mb-6 flex space-x-4">
-            <button onclick="trainModel()" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 text-sm">Latih Model</button>
-            <button onclick="saveEvaluation()" class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 text-sm">Simpan ke Database</button>
+          <!-- Grafik 2 Kolom -->
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-10 justify-center">
+            <!-- Pie Chart -->
+            <div class="bg-gray-50 p-4 rounded-xl shadow-md flex flex-col items-center w-full md:w-auto">
+              <h2 class="text-center font-semibold text-gray-700 mb-2">Distribusi Rekomendasi Toko</h2>
+              <canvas id="pieChart" width="160" height="160"></canvas>
+            </div>
+
+            <!-- Bar Chart -->
+            <div class="bg-gray-50 p-4 rounded-xl shadow-md flex flex-col items-center w-full md:w-auto">
+              <h2 class="text-center font-semibold text-gray-700 mb-2">Perbandingan Metrik Evaluasi Model</h2>
+              <canvas id="evalChart" width="320" height="200"></canvas>
+            </div>
           </div>
 
-          <!-- Chart -->
-          <canvas id="evalChart" height="120" class="mb-8"></canvas>
 
-          <!-- Tabel Hasil -->
-          <div class="overflow-x-auto">
-            <table class="min-w-full border text-sm text-center">
-              <thead class="bg-gray-200 font-semibold text-gray-700">
-                <tr>
-                  <th class="border px-4 py-2">Model</th>
-                  <th class="border px-4 py-2">Akurasi</th>
-                  <th class="border px-4 py-2">Presisi</th>
-                  <th class="border px-4 py-2">Recall</th>
-                  <th class="border px-4 py-2">F1 Score</th>
-                  <th class="border px-4 py-2">Waktu Proses (s)</th>
-                </tr>
-              </thead>
-              <tbody id="evalTable" class="bg-white">
-                <!-- Diisi dari JS -->
-              </tbody>
-            </table>
-          </div>
+          <!-- Tabel Evaluasi -->
+            <div class="overflow-x-auto">
+              <h2 class="text-lg font-semibold text-gray-700 mb-3">Detail Evaluasi</h2>
+              <table class="min-w-full border text-sm text-center">
+                <thead class="bg-gray-200 font-semibold text-gray-700">
+                  <tr>
+                    <th class="border px-4 py-2">Tanggal Evaluasi</th>
+                    <th class="border px-4 py-2">Model</th>
+                    <th class="border px-4 py-2">Akurasi</th>
+                    <th class="border px-4 py-2">Presisi</th>
+                    <th class="border px-4 py-2">Recall</th>
+                    <th class="border px-4 py-2">F1 Score</th>
+                    <th class="border px-4 py-2">Waktu Proses (s)</th>
+                  </tr>
+                </thead>
+                <tbody id="evaluation-table" class="bg-white">
+                  {% for row in logs %}
+                  <tr>
+                    <td class="border px-4 py-2">{{ row.evaluationAt.strftime('%d-%m-%Y %H:%M') }}</td>
+                    <td class="border px-4 py-2">{{ row.model_name }}</td>
+                    <td class="border px-4 py-2">{{ (row.accuracy * 100) | round(2) }}%</td>
+                    <td class="border px-4 py-2">{{ (row.precision * 100) | round(2) }}%</td>
+                    <td class="border px-4 py-2">{{ (row.recall * 100) | round(2) }}%</td>
+                    <td class="border px-4 py-2">{{ (row.f1_score * 100) | round(2) }}%</td>
+                    <td class="border px-4 py-2">{{ row.training_time or '-' }}</td>
+                  </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+              <div id="pagination" class="mt-4 flex justify-center gap-2"></div>
+            </div>
         </div>
       </main>
-
     </div>
   </div>
 
+  <!-- Data JSON untuk Chart -->
+  <script id="eval-data" type="application/json">
+    {
+      "labels": {{ logs | map(attribute='model_name') | list | tojson }},
+      "accuracy": {{ logs | map(attribute='accuracy') | list | tojson }},
+      "precision": {{ logs | map(attribute='precision') | list | tojson }},
+      "recall": {{ logs | map(attribute='recall') | list | tojson }},
+      "f1": {{ logs | map(attribute='f1_score') | list | tojson }}
+    }
+  </script>
+
+  <script id="pie-data" type="application/json">
+    {
+      "labels": ["Toko Direkomendasikan", "Toko Tidak Direkomendasikan"],
+      "counts": [
+        {{ logs | selectattr("label_toko", "equalto", "Toko Direkomendasikan") | list | length }},
+        {{ logs | selectattr("label_toko", "equalto", "Toko Tidak Direkomendasikan") | list | length }}
+      ]
+    }
+  </script>
+
+  
+  <!-- Script Chart.js -->
   <script>
-    let evalData = [];
+    const evalData = JSON.parse(document.getElementById("eval-data").textContent);
+    const pieData = JSON.parse(document.getElementById("pie-data").textContent);
 
-    async function trainModel() {
-      const res = await fetch("/train-svm");
-      const data = await res.json();
-      evalData = data.results || [];
-      renderTable();
-      renderChart();
-      alert("✅ Training selesai");
-    }
-
-    async function saveEvaluation() {
-      const res = await fetch("/save-evaluation", { method: "POST" });
-      const data = await res.json();
-      alert(data.message || "Berhasil disimpan");
-    }
-
-    function renderTable() {
-      const tbody = document.getElementById("evalTable");
-      tbody.innerHTML = "";
-      evalData.forEach(row => {
-        tbody.innerHTML += `
-          <tr>
-            <td class="border px-4 py-2">${row.model}</td>
-            <td class="border px-4 py-2">${(row.accuracy * 100).toFixed(2)}%</td>
-            <td class="border px-4 py-2">${(row.precision * 100).toFixed(2)}%</td>
-            <td class="border px-4 py-2">${(row.recall * 100).toFixed(2)}%</td>
-            <td class="border px-4 py-2">${(row.f1_score * 100).toFixed(2)}%</td>
-            <td class="border px-4 py-2">${row.time_process.toFixed(2)}</td>
-          </tr>
-        `;
-      });
-    }
-
-    function renderChart() {
-      const ctx = document.getElementById("evalChart").getContext("2d");
-      const labels = evalData.map(e => e.model);
-      const accuracy = evalData.map(e => e.accuracy * 100);
-      const precision = evalData.map(e => e.precision * 100);
-      const recall = evalData.map(e => e.recall * 100);
-      const f1 = evalData.map(e => e.f1_score * 100);
-
-      new Chart(ctx, {
+    if (evalData.labels.length > 0) {
+      new Chart(document.getElementById("evalChart").getContext("2d"), {
         type: "bar",
         data: {
-          labels: labels,
+          labels: evalData.labels,
           datasets: [
-            { label: "Akurasi", data: accuracy, backgroundColor: "#3b82f6" },
-            { label: "Presisi", data: precision, backgroundColor: "#10b981" },
-            { label: "Recall", data: recall, backgroundColor: "#facc15" },
-            { label: "F1 Score", data: f1, backgroundColor: "#ef4444" }
+            { label: "Akurasi", data: evalData.accuracy.map(x => x * 100), backgroundColor: "#3b82f6" },
+            { label: "Presisi", data: evalData.precision.map(x => x * 100), backgroundColor: "#10b981" },
+            { label: "Recall", data: evalData.recall.map(x => x * 100), backgroundColor: "#facc15" },
+            { label: "F1 Score", data: evalData.f1.map(x => x * 100), backgroundColor: "#ef4444" }
           ]
         },
         options: {
@@ -130,6 +123,31 @@
               beginAtZero: true,
               max: 100,
               title: { display: true, text: 'Persentase (%)' }
+            }
+          }
+        }
+      });
+    }
+
+    if (pieData.labels.length > 0) {
+      new Chart(document.getElementById("pieChart").getContext("2d"), {
+        type: "pie",
+        data: {
+          labels: pieData.labels,
+          datasets: [{
+            data: pieData.counts,
+            backgroundColor: ["#34d399", "#f87171"]
+          }]
+        },
+        options: {
+          responsive: true,
+          plugins: {
+            title: {
+              display: true,
+              text: 'Toko Direkomendasikan vs Tidak'
+            },
+            legend: {
+              position: 'bottom'
             }
           }
         }

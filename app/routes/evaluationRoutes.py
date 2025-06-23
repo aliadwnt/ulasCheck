@@ -1,20 +1,7 @@
 from flask import Blueprint
-from app.controllers.evaluationController import (
-    render_evaluation_page,
-    train_model_controller,
-    save_evaluation_to_db
-)
+from app.controllers.evaluationController import evaluate_model, show_evaluation
 
-evaluation = Blueprint("evaluation", __name__)
+evaluation = Blueprint("evaluation", __name__, url_prefix="/evaluation")
 
-@evaluation.route("/admin/evaluation")
-def evaluation_page():
-    return render_evaluation_page()
-
-@evaluation.route("/train-svm")
-def train_svm():
-    return train_model_controller()
-
-@evaluation.route("/save-evaluation", methods=["POST"])
-def save_evaluation():
-    return save_evaluation_to_db()
+evaluation.route("/start", methods=["POST"])(evaluate_model)
+evaluation.route("/", methods=["GET"])(show_evaluation)

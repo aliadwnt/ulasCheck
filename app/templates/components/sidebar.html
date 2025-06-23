@@ -28,13 +28,13 @@
       </li>
       <li>
         <a href="{{ url_for('dataset.get_all_dataset') }}"
-           class="block py-2 px-4 rounded-md hover:bg-orange-700 {% if request.endpoint == 'admin.admin_dataset' %} bg-orange-700 {% endif %}">
+           class="block py-2 px-4 rounded-md hover:bg-orange-700 {% if request.endpoint == 'dataset.get_all_dataset' %} bg-orange-700 {% endif %}">
           Dataset
         </a>
       </li>
       <li>
-        <a href="{{ url_for('evaluation.evaluation_page') }}"
-           class="block py-2 px-4 rounded-md hover:bg-orange-700 {% if request.endpoint == 'evaluation.evaluation_page' %} bg-orange-700 {% endif %}">
+        <a href="{{ url_for('evaluation.show_evaluation') }}"
+           class="block py-2 px-4 rounded-md hover:bg-orange-700 {% if request.endpoint == 'evaluation.show_evaluation' %} bg-orange-700 {% endif %}">
           Evaluation
         </a>
       </li>

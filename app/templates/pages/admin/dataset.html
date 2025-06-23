@@ -20,23 +20,24 @@
       <div class="bg-white p-6 rounded-lg shadow mb-6">
        <div class="flex flex-col md:flex-row md:justify-between md:items-center gap-3 mb-4">
         <h1 class="text-2xl font-semibold text-gray-800">Dataset Review</h1>
-      <div class="flex flex-col sm:flex-row sm:justify-end sm:items-center gap-2 w-full sm:w-auto">
-        <!-- Search -->
-        <div class="relative w-full sm:w-64">
-          <input type="text" id="searchInput"
+          </div>
+          <div class="flex flex-col sm:flex-row sm:justify-end sm:items-center gap-2 w-full sm:w-auto">
+          <!-- Search -->
+          <div class="relative w-full sm:w-64">
+           <input type="text" id="searchInput"
             placeholder="Cari username, review, atau rating..."
-            class="w-full pr-10 pl-4 py-2 border rounded shadow-sm focus:outline-none focus:ring-2 focus:ring-orange-500"
+            class="w-full pr-10 pl-4 py-2 border rounded shadow-sm focus:outline-none focus:ring-2 focus:ring-orange-500 text-sm"
           >
-          <span class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none text-gray-400">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                d="M21 21l-4.35-4.35M11 18a7 7 0 100-14 7 7 0 000 14z" />
-            </svg>
-          </span>
-        </div>
+            <span class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none text-gray-400">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M21 21l-4.35-4.35M11 18a7 7 0 100-14 7 7 0 000 14z" />
+              </svg>
+            </span>
+          </div>
 
         <select id="ratingFilter"
-          class="px-3 py-2 border rounded shadow-sm focus:outline-none focus:ring-2 focus:ring-orange-500 text-sm w-full sm:w-auto">
+          class="px-3 py-2 border rounded shadow-sm focus:outline-none focus:ring-2 focus:ring-orange-500 text-sm w-full sm:w-auto text-gray-500">
           <option value="">Semua Rating</option>
           <option value="5">5 Bintang</option>
           <option value="4">4 Bintang</option>
@@ -56,8 +57,7 @@
           + Tambah Data
         </button>
       </div>
-</div>
-        <div class="overflow-x-auto">
+        <div class="overflow-x-auto mt-4">
           <table class="min-w-full table-auto text-sm border-collapse">
             <thead class="bg-gray-200 text-gray-700 font-semibold">
               <tr>

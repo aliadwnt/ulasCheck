@@ -55,28 +55,40 @@ def download_file(id):
 def analyze_file(id):
     review = Review.query.get_or_404(id)
 
-    # Pastikan review memiliki file_data
     if not review.file_data:
         flash("Data ulasan tidak ditemukan.", "danger")
         return redirect(f"/review/{id}")
 
-    # Membaca data CSV dari file_data yang ada dalam review
-    file_stream = io.StringIO(review.file_data.decode("utf-8"))
-    temp_df = pd.read_csv(file_stream)
+    # Baca CSV dari field file_data
+    try:
+        file_stream = io.StringIO(review.file_data.decode("utf-8"))
+        temp_df = pd.read_csv(file_stream)
+    except Exception as e:
+        flash(f"Gagal membaca data: {str(e)}", "danger")
+        return redirect(f"/review/{id}")
 
-    # Panggil fungsi analisis untuk mendapatkan hasil analisis langsung menggunakan DataFrame
-    hasil = analyze_data(temp_df)
+    # Jalankan analisis
+    try:
+        hasil = analyze_data(temp_df)
+    except Exception as e:
+        flash(f"Gagal melakukan analisis: {str(e)}", "danger")
+        return redirect(f"/review/{id}")
 
-    return render_template("pages/public/dashboard.html", result={
-        "total_all": hasil["total"],
-        "total_pos": hasil["positif"],
-        "total_neg": hasil["negatif"],
-        "persen_pos": hasil["persen_pos"],
-        "toko_label": hasil["label_toko"],
-        "aspek": hasil["aspek_tertinggi"],
-        "persen_tertinggi": hasil["persen_aspek"],
-        "scraped_data": temp_df.to_dict(orient='records')  # Menambahkan data review yang bersih ke template
-    })
+    return render_template("pages/public/dashboard.html",
+        review=review,
+        scraped_data=temp_df.to_dict(orient="records"),
+        result={
+            "total_all": hasil.get("total", 0),
+            "total_pos": hasil.get("positif", 0),
+            "total_neg": hasil.get("negatif", 0),
+            "persen_pos": hasil.get("persen_pos", 0),
+            "toko_label": hasil.get("label_toko", "Tidak Diketahui"),
+            "aspek": hasil.get("aspek_tertinggi", "-"),
+            "persen_tertinggi": hasil.get("persen_aspek", 0),
+            "aspek_persen": hasil.get("aspek_persen", {})  # <-- pastikan ini dictionary
+        }
+    )
+
 
 def cancel(id):
     flash("❌ Analisis dibatalkan", "info")

@@ -1,6 +1,7 @@
 import pandas as pd
 import re
 import numpy as np
+import pickle, os, time
 from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LogisticRegression
 from sklearn.svm import SVC
@@ -40,50 +41,36 @@ df["CleanReview"] = df["Review"].apply(clean_text)
 vectorizer = TfidfVectorizer(stop_words=stop_words)
 X = vectorizer.fit_transform(df["CleanReview"])
 y = df["Label"]
-
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
 
 # ====================
 # 4. Train Logistic Regression
 # ====================
+start_log = time.time()
 log_model = LogisticRegression(class_weight='balanced', max_iter=1000)
 log_model.fit(X_train, y_train)
-y_pred_log = log_model.predict(X_test)
+end_log = time.time()
 
-print("\n=== LOGISTIC REGRESSION REPORT ===")
-print(classification_report(y_test, y_pred_log))
+y_pred_log = log_model.predict(X_test)
 acc_log = accuracy_score(y_test, y_pred_log)
+cm_log = confusion_matrix(y_test, y_pred_log)
+time_log = round(end_log - start_log, 4)
 
 # ====================
 # 5. Train SVM
 # ====================
+start_svm = time.time()
 svm_model = SVC(kernel='linear', class_weight='balanced')
 svm_model.fit(X_train, y_train)
+end_svm = time.time()
+
 y_pred_svm = svm_model.predict(X_test)
-
-print("\n=== SVM REPORT ===")
-print(classification_report(y_test, y_pred_svm))
 acc_svm = accuracy_score(y_test, y_pred_svm)
+cm_svm = confusion_matrix(y_test, y_pred_svm)
+time_svm = round(end_svm - start_svm, 4)
 
 # ====================
-# 6. Confusion Matrix
-# ====================
-def plot_confusion_matrix(y_true, y_pred, model_name):
-    cm = confusion_matrix(y_true, y_pred)
-    labels = ["Negatif (0)", "Positif (1)"]
-    plt.figure(figsize=(5, 4))
-    sns.heatmap(cm, annot=True, fmt='d', cmap='Blues', xticklabels=labels, yticklabels=labels)
-    plt.title(f"Confusion Matrix - {model_name}")
-    plt.xlabel("Predicted Label")
-    plt.ylabel("True Label")
-    plt.tight_layout()
-    plt.show()
-
-plot_confusion_matrix(y_test, y_pred_log, "Logistic Regression")
-plot_confusion_matrix(y_test, y_pred_svm, "SVM")
-
-# ====================
-# 7. Pilih Model Terbaik
+# 6. Pilih Model Terbaik
 # ====================
 if acc_log >= acc_svm:
     best_model = log_model
@@ -92,10 +79,8 @@ else:
     best_model = svm_model
     best_model_name = "SVM"
 
-print(f"\n>>> Model terbaik: {best_model_name}")
-
 # ====================
-# 8. Prediksi Semua Data & Analisis Aspek Positif
+# 7. Prediksi Semua Data
 # ====================
 df["PredictedLabel"] = best_model.predict(X)
 
@@ -120,7 +105,7 @@ def analisis_aspek_positif(df, review_col='CleanReview', label_col='PredictedLab
 aspek_result = analisis_aspek_positif(df)
 
 # ====================
-# 9. Evaluasi Toko
+# 8. Evaluasi Toko
 # ====================
 total_pos = (df["PredictedLabel"] == 1).sum()
 total_neg = (df["PredictedLabel"] == 0).sum()
@@ -131,23 +116,39 @@ aspek_tertinggi = max(aspek_result, key=aspek_result.get)
 jumlah_tertinggi = aspek_result[aspek_tertinggi]
 persen_tertinggi = round((jumlah_tertinggi / total_all) * 100, 2)
 
-print("\n=== PENILAIAN TOKO ===")
-print(f"- Total Ulasan: {total_all}")
-print(f"- Positif: {total_pos} ({persen_pos}%)")
-print(f"- Negatif: {total_neg} ({round((total_neg / total_all) * 100, 2)}%)")
-print(f"- Label Toko: {toko_label}")
-print(f"- Aspek yang menonjol (positif): '{aspek_tertinggi}' sebanyak {jumlah_tertinggi} review ({persen_tertinggi}%)")
-
 # ====================
-# 10. Visualisasi Aspek Positif
+# 9. Simpan Evaluasi & Model
 # ====================
-labels = list(aspek_result.keys())
-counts = [aspek_result[k] for k in labels]
+evaluation_result = {
+    "accuracy": {
+        "Logistic Regression": round(acc_log * 100, 2),
+        "SVM": round(acc_svm * 100, 2)
+    },
+    "time_process": {
+        "Logistic Regression": time_log,
+        "SVM": time_svm
+    },
+    "confusion_matrix": {
+        "Logistic Regression": cm_log.tolist(),
+        "SVM": cm_svm.tolist()
+    },
+    "best_model": best_model_name,
+    "label_toko": toko_label,
+    "persen_positif": persen_pos,
+    "aspek_tertinggi": aspek_tertinggi,
+    "jumlah_aspek": jumlah_tertinggi,
+    "persen_aspek": persen_tertinggi,
+    "aspek_result": dict(aspek_result)
+}
 
-plt.figure(figsize=(10, 6))
-plt.bar(labels, counts, color='green')
-plt.ylabel("Jumlah Review Positif")
-plt.title(f"Aspek Positif (Model: {best_model_name})")
-plt.xticks(rotation=15)
-plt.tight_layout()
-plt.show()
+os.makedirs("models", exist_ok=True)
+with open("models/evaluation_result.pkl", "wb") as f:
+    pickle.dump(evaluation_result, f)
+
+with open("models/best_model.pkl", "wb") as f:
+    pickle.dump(best_model, f)
+
+with open("models/vectorizer.pkl", "wb") as f:
+    pickle.dump(vectorizer, f)
+
+print(">>> Evaluasi selesai dan disimpan ke folder 'models'") 

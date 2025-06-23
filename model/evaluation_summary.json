@@ -1,0 +1,25 @@
+{
+    "model_name": "SVM (RBF)",
+    "gamma": 0.41,
+    "C": 1.1,
+    "accuracy": 0.9947,
+    "precision": 0.9978,
+    "recall": 0.9962,
+    "f1_score": 0.997,
+    "training_time": 31.4556,
+    "total_review": 51100,
+    "positif": 45460,
+    "negatif": 5640,
+    "persen_positif": 88.96,
+    "label_toko": "Direkomendasikan",
+    "aspek_tertinggi": "produk",
+    "jumlah_aspek": 22233,
+    "persen_aspek": 48.91,
+    "aspek_persen": {
+        "pengiriman": 24.5,
+        "pelayanan": 16.21,
+        "produk": 48.91,
+        "harga": 9.85,
+        "packing": 24.28
+    }
+}

@@ -16,13 +16,17 @@ def create_app():
     from app.routes.adminRoutes import admin      
     from app.routes.publicRoutes import public
     from app.routes.reviewRoutes import review  
-    from app.routes.datasetRoutes import dataset   
+    from app.routes.datasetRoutes import dataset  
+    from app.routes.evaluationRoutes import evaluation  
+    from app.routes.analyzeRoutes import analyze 
 
     app.register_blueprint(main)    
     app.register_blueprint(admin)  
     app.register_blueprint(public)
     app.register_blueprint(review)
     app.register_blueprint(dataset)
+    app.register_blueprint(evaluation)
+    app.register_blueprint(analyze)
 
     # Import semua model agar dikenali oleh migrasi
     from app.models import userModel, reviewModel, predictionModel, evaluationModel, datasetModel

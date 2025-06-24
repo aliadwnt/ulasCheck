@@ -102,7 +102,7 @@
         {{ result.toko_label }}
       </span>
     </li>
-    <li>
+    <!-- <li>
       <strong>Aspek Menonjol:</strong>
         <span class="inline-flex items-center space-x-2">
           <span class="italic text-orange-700 font-medium">{{ result.aspek }}</span>
@@ -110,10 +110,10 @@
             {{ result.persen_tertinggi }}%
           </span>
         </span>
-    </li>
+    </li> -->
     {% if result.aspek_persen and result.aspek_persen|length > 0 %}
   <li>
-    <strong>Distribusi Aspek Positif:</strong>
+    <strong>Aspek Positif:</strong>
     <ul class="pl-4 mt-2 list-disc text-sm">
       {% for aspek, persen in result.aspek_persen.items() %}
         <li>

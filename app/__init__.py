@@ -28,6 +28,6 @@ def create_app():
     app.register_blueprint(evaluation)
     app.register_blueprint(analyze)
 
-    from app.models import userModel, reviewModel, evaluationModel, evaluationModel, datasetModel
+    from app.models import userModel, reviewModel, evaluationModel, datasetModel
 
     return app

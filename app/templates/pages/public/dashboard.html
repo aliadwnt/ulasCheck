@@ -68,19 +68,75 @@
         </table>
         <div id="pagination" class="mt-4 flex justify-end items-center space-x-3 text-sm text-orange-800 font-medium"></div>
       </div>
-      <!-- Tombol aksi -->
-        <div class="flex justify-between mt-6 space-x-3">
-          <form method="POST" action="/download/{{ review.id }}">
-            <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-md transition duration-300 transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-blue-500">Simpan File</button>
-          </form>
-          <form method="POST" action="/analyze/{{ review.id }}">
-            <button type="submit" class="bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-md transition duration-300 transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-green-500">Analisis Sekarang</button>
-          </form>
-          <form method="GET" action="/cancel/{{ review.id }}">
-            <button type="submit" class="bg-red-600 hover:bg-red-700 text-white px-6 py-3 rounded-md transition duration-300 transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-red-500">Cancel</button>
-          </form>
+      <!-- Modal loading -->
+      <div id="analyzeStatus" class="fixed inset-0 z-50 bg-black/30 items-center justify-center hidden">
+        <div class="bg-white rounded-xl shadow-lg px-6 py-5 flex items-center space-x-3">
+          <svg class="animate-spin h-6 w-6 text-orange-600" xmlns="http://www.w3.org/2000/svg" fill="none"
+            viewBox="0 0 24 24">
+            <circle class="opacity-25" cx="12" cy="12" r="10"
+              stroke="currentColor" stroke-width="4"></circle>
+            <path class="opacity-75" fill="currentColor"
+              d="M4 12a8 8 0 018-8v8H4z"></path>
+          </svg>
+          <span class="text-sm text-orange-700 font-medium">Sedang membersihkan data dan melakukan analisis</span>
         </div>
-      {% endif %}
+      </div>
+
+        <!-- Tombol aksi -->
+        <div class="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-3 mt-6">
+
+          <!-- Kartu: Simpan File -->
+          <form method="POST" action="/download/{{ review.id }}">
+            <button type="submit" class="w-full block bg-blue-50 hover:bg-blue-100 text-blue-700 px-3 py-4 rounded-lg shadow transition text-center">
+              <div class="flex flex-col items-center space-y-1">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M4 16v1a2 2 0 002 2h12a2 2 0 002-2v-1M12 12v9m0 0l-3-3m3 3l3-3M4 4h16v4H4V4z" />
+                </svg>
+                <span class="text-xs font-semibold">Simpan .csv</span>
+              </div>
+            </button>
+          </form>
+
+        <!-- Form: Analisis Sekarang -->
+        <form id="analyzeForm" method="POST" action="/analyze/{{ review.id }}">
+          <button id="analyzeBtn" type="submit" class="w-full block bg-green-50 hover:bg-green-100 text-green-700 px-3 py-4 rounded-lg shadow transition text-center">
+            <div class="flex flex-col items-center space-y-1">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M11 11V6a1 1 0 012 0v5m-1 5h.01M12 17h0M7 17h.01M17 17h.01M7 21h10a2 2 0 002-2v-2H5v2a2 2 0 002 2z" />
+              </svg>
+              <span class="text-xs font-semibold">Analisis</span>
+            </div>
+          </button>
+        </form>
+
+          <!-- Kartu: Batal -->
+          <form method="GET" action="/cancel/{{ review.id }}">
+            <button type="submit" class="w-full block bg-red-50 hover:bg-red-100 text-red-700 px-3 py-4 rounded-lg shadow transition text-center">
+              <div class="flex flex-col items-center space-y-1">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M6 18L18 6M6 6l12 12" />
+                </svg>
+                <span class="text-xs font-semibold">Batal</span>
+              </div>
+            </button>
+          </form>
+
+          <!-- Kartu: Cek Toko Lain -->
+          <a href="/" class="block bg-gray-50 hover:bg-gray-100 text-gray-700 px-3 py-4 rounded-lg shadow transition text-center">
+            <div class="flex flex-col items-center space-y-1">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M21 21l-4.35-4.35M16 10a6 6 0 11-12 0 6 6 0 0112 0z" />
+              </svg>
+              <span class="text-xs font-semibold">Ulangi Cek Toko</span>
+            </div>
+          </a>
+
+        </div>
+              {% endif %}
 
       {% if result %}
       <!-- Hasil analisis atau cancel -->
@@ -89,7 +145,7 @@
   <ul class="space-y-2 text-gray-700">
     <li><strong>Total Ulasan:</strong> {{ result.total_all }}</li>
     <li><strong>Positif:</strong> {{ result.total_pos }} ({{ result.persen_pos }}%)</li>
-    <li><strong>Negatif:</strong> {{ result.total_neg }} ({{ 100 - result.persen_pos }}%)</li>
+    <li><strong>Negatif:</strong> {{ result.total_neg }} ({{ (100 - result.persen_pos)|round(2) }}%)</li>
     <li>
       <strong>Label Toko:</strong>
       <span class="inline-block px-2 py-1 rounded-full font-bold text-white
@@ -227,5 +283,25 @@
       displayPage(1);
     }
   });
+
+document.getElementById("analyzeForm").addEventListener("submit", function (e) {
+  e.preventDefault(); // Cegah submit langsung
+
+  // Tampilkan modal loading
+  const analyzeStatus = document.getElementById("analyzeStatus");
+  analyzeStatus.classList.remove("hidden");
+  analyzeStatus.classList.add("flex");
+
+  // Disable tombol
+  const btn = document.getElementById("analyzeBtn");
+  btn.disabled = true;
+  btn.classList.add("opacity-50", "cursor-not-allowed");
+
+  // Tunggu 3 detik, lalu submit
+  setTimeout(() => {
+    e.target.submit();
+  }, 3000);
+});
+
   </script>
 {% endblock %}

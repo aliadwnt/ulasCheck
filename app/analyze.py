@@ -16,7 +16,8 @@ def clean_text(text):
     if not isinstance(text, str):
         return ""
     text = text.lower()  # ke huruf kecil
-    text = re.sub(r'[^a-zA-Z\s]', ' ', text)  # hapus karakter selain huruf
+    text = text.replace(':', ' ')  # ganti tanda ':' dengan spasi
+    text = re.sub(r'[^a-zA-Z\s]', ' ', text)  # hapus karakter selain huruf dan spasi
     text = re.sub(r'\s+', ' ', text).strip()  # hapus spasi ganda
     return text
 

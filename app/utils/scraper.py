@@ -4,6 +4,7 @@ from urllib.parse import urlparse, parse_qs
 from sqlalchemy import func
 from app import db, socketio
 from app.models.reviewModel import Review
+# from app.utils.webdriver_scraper import get_shop_name_with_driver  # Pastikan ini ada
 
 def load_cookie(cookies_json) -> str:
     try:
@@ -19,7 +20,6 @@ def shopee(url, cookies_json):
     if not cookies:
         return None, "❌ Cookie tidak valid atau kosong"
 
-    # Ambil shop_id dan user_id dari URL
     try:
         parsed = urlparse(url)
         query = parse_qs(parsed.query)
@@ -32,6 +32,9 @@ def shopee(url, cookies_json):
     except Exception as e:
         return None, f"❌ Gagal memproses URL: {e}"
 
+    # Ambil nama toko dengan WebDriver
+    # shop_name = get_shop_name_with_driver(shop_id)
+
     headers = {
         "content-type": "application/json",
         "cookie": cookies,
@@ -40,7 +43,7 @@ def shopee(url, cookies_json):
 
     offset = 0
     limit = 6
-    max_reviews = 100
+    max_reviews = 600
     result = []
 
     while len(result) < max_reviews:
@@ -70,7 +73,6 @@ def shopee(url, cookies_json):
                     "ReviewAt": datetime.fromtimestamp(value["ctime"]).strftime("%Y-%m-%d %H:%M"),
                 })
 
-                # Emit progress ke frontend (jika ada socket listener)
                 socketio.emit("progress", {
                     "current": len(result),
                     "total": max_reviews
@@ -84,7 +86,6 @@ def shopee(url, cookies_json):
     if not result:
         return None, "❌ Tidak ada data review yang berhasil diambil"
 
-    # Buat nama file yang unik berdasarkan shop_id, tanggal, dan urutan
     tanggal = datetime.now().strftime("%Y%m%d")
     jumlah_scraping = (
         db.session.query(func.count(Review.id))
@@ -96,7 +97,6 @@ def shopee(url, cookies_json):
     )
     file_name = f"rating{shop_id}-{tanggal}-{jumlah_scraping + 1}.csv"
 
-    # Simpan data ke dalam memori sebagai BLOB
     keys = result[0].keys()
     output_stream = io.StringIO()
     writer = csv.DictWriter(output_stream, fieldnames=keys)
@@ -107,6 +107,7 @@ def shopee(url, cookies_json):
     try:
         review = Review(
             shop_id=shop_id,
+            # shop_name=shop_name,  
             file=file_name,
             file_data=file_data
         )

@@ -1,6 +1,6 @@
 <!-- Sidebar -->
 <div id="sidebar"
-     class="font-poppins w-64 h-screen fixed top-0 left-0 bg-orange-500 text-white z-30 p-6 flex flex-col justify-between overflow-y-auto">
+     class="font-poppins w-64 h-screen fixed top-0 left-0 bg-orange-500 text-white z-30 p-6 flex flex-col justify-between overflow-y-auto transform -translate-x-full md:translate-x-0 transition-transform duration-300 ease-in-out">
   <div>
     <!-- Logo -->
     <a href="/" class="flex flex-col items-center justify-center mb-8 group transition text-center">
@@ -53,7 +53,6 @@
 <!-- Toggle Button (visible on small screen) -->
 <button id="toggleSidebar"
         class="fixed top-4 left-4 z-40 md:hidden bg-orange-500 text-white p-2 rounded-md shadow-md focus:outline-none">
-  <!-- Hamburger Icon -->
   <svg class="h-6 w-6" fill="none" stroke="currentColor" stroke-width="2"
        viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
     <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16"></path>

@@ -65,6 +65,9 @@ def shopee(url, cookies_json):
                 if len(result) >= max_reviews:
                     break
 
+                if not value.get("comment"):
+                    continue
+
                 result.append({
                     "Username": value.get("author_username", ""),
                     "Produk": value.get("product_items", [{}])[0].get("name", ""),
@@ -107,7 +110,7 @@ def shopee(url, cookies_json):
     try:
         review = Review(
             shop_id=shop_id,
-            # shop_name=shop_name,  
+            # shop_name=shop_name,
             file=file_name,
             file_data=file_data
         )

@@ -20,10 +20,16 @@
           placeholder="Masukkan link ulasan toko shopee"
           required
         />
-        <button id="scrapeBtn" type="submit" class="bg-orange-600 hover:bg-orange-700 text-white py-2 px-4 rounded transition">
-          Scrape
-        </button>
+        <div class="flex space-x-4">
+          <button id="scrapeBtn" type="submit" class="bg-orange-600 hover:bg-orange-700 text-white py-2 px-4 rounded transition">
+            Scrape
+          </button>
+          <button id="cancelBtn" type="button" class="bg-red-500 hover:bg-red-600 text-white py-2 px-4 rounded transition hidden" onclick="cancelScraping()">
+            Batalkan
+          </button>
+        </div>
       </form>
+
 
       <!-- Progress Loading -->
       <div id="loadingContainer" class="mt-6 hidden text-center animate-fade-in">
@@ -131,7 +137,7 @@
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                   d="M21 21l-4.35-4.35M16 10a6 6 0 11-12 0 6 6 0 0112 0z" />
               </svg>
-              <span class="text-xs font-semibold">Ulangi Cek Toko</span>
+              <span class="text-xs font-semibold">Ulangi Scraping</span>
             </div>
           </a>
         </div>
@@ -163,8 +169,8 @@
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
       </svg>
       <span class="font-semibold">Link Toko:</span>
-      <a href="https://shopee.co.id/shop/{{ review.shop_id }}" target="_blank" class="text-blue-600 underline hover:text-blue-800 break-all">
-        https://shopee.co.id/shop/{{ review.shop_id }}
+     <a href="{{ review.shop_url }}" target="_blank" class="text-blue-600 underline hover:text-blue-800 break-all">
+        {{ review.shop_url }}
       </a>
     </li>
 
@@ -243,26 +249,38 @@
   {% include 'components/footer.html' %}
 
   <!-- Socket.IO -->
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
   <script>
-    const socket = io();
+      const socket = io();
+      let scrapingInProgress = false;
 
-    socket.on("progress", function (data) {
-      const { current, total } = data;
-      const percent = Math.round((current / total) * 100);
+      // Menerima progress dari server
+      socket.on("progress", function (data) {
+        const { current, total } = data;
+        const percent = Math.round((current / total) * 100);
 
-      document.getElementById("loadingContainer").classList.remove("hidden");
-      document.getElementById("progressText").textContent = `${current}/${total}`;
-      document.getElementById("progressBar").style.width = `${percent}%`;
-    });
+        document.getElementById("loadingContainer").classList.remove("hidden");
+        document.getElementById("progressText").textContent = `${current}/${total}`;
+        document.getElementById("progressBar").style.width = `${percent}%`;
+      });
 
-    function handleScrapeStart() {
-      // tampilkan loading dan disable tombol saat scraping dimulai
-      document.getElementById("loadingContainer").classList.remove("hidden");
-      document.getElementById("scrapeBtn").disabled = true;
-      document.getElementById("scrapeBtn").textContent = "Sedang Memproses...";
-    }
+      // Saat scraping dimulai
+      function handleScrapeStart() {
+        scrapingInProgress = true;
+        document.getElementById("loadingContainer").classList.remove("hidden");
+        document.getElementById("scrapeBtn").disabled = true;
+        document.getElementById("scrapeBtn").textContent = "Sedang Memproses...";
+        document.getElementById("cancelBtn").classList.remove("hidden");
+      }
+
+      // Fungsi batalkan scraping (hanya membatalkan di sisi UI)
+      function cancelScraping() {
+        if (scrapingInProgress) {
+          // Redirect ke halaman utama atau halaman pembatalan
+          window.location.href = "/";
+        }
+      }
 
     document.addEventListener("DOMContentLoaded", function () {
     const rows = document.querySelectorAll("#tableBody tr");

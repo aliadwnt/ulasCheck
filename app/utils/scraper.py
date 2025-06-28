@@ -4,7 +4,6 @@ from urllib.parse import urlparse, parse_qs
 from sqlalchemy import func
 from app import db, socketio
 from app.models.reviewModel import Review
-# from app.utils.webdriver_scraper import get_shop_name_with_driver  # Pastikan ini ada
 
 def load_cookie(cookies_json) -> str:
     try:
@@ -31,9 +30,6 @@ def shopee(url, cookies_json):
             return None, "❌ URL tidak valid. Tidak dapat menemukan shop_id atau user_id."
     except Exception as e:
         return None, f"❌ Gagal memproses URL: {e}"
-
-    # Ambil nama toko dengan WebDriver
-    # shop_name = get_shop_name_with_driver(shop_id)
 
     headers = {
         "content-type": "application/json",
@@ -82,7 +78,7 @@ def shopee(url, cookies_json):
                 })
 
             offset += limit
-            time.sleep(1)
+            time.sleep(0.1)
         except Exception as e:
             return None, f"❌ Gagal mengambil data review: {e}"
 
@@ -108,9 +104,11 @@ def shopee(url, cookies_json):
     file_data = output_stream.getvalue().encode("utf-8")
 
     try:
+        shop_url = f"https://shopee.co.id/shop/{shop_id}"
+
         review = Review(
             shop_id=shop_id,
-            # shop_name=shop_name,
+            shop_url=shop_url,  # Simpan URL ke kolom shop_url
             file=file_name,
             file_data=file_data
         )

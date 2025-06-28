@@ -18,18 +18,18 @@ review.add_url_rule(
     methods=["GET"]
 )
 
-# Tambah review
+# Tambah review (POST via AJAX, GET sebaiknya tidak perlu)
 review.add_url_rule(
     "/admin/review/add",
     view_func=reviewController.add_review,
-    methods=["GET", "POST"]
+    methods=["POST"]
 )
 
-# Edit review
+# Edit review (POST via AJAX, GET sebaiknya tidak perlu)
 review.add_url_rule(
     "/admin/review/edit/<int:id>",
     view_func=reviewController.edit_review,
-    methods=["GET", "POST"]
+    methods=["POST"]
 )
 
 # Hapus review
@@ -37,4 +37,11 @@ review.add_url_rule(
     "/admin/review/delete/<int:id>",
     view_func=reviewController.delete_review,
     methods=["POST"]
+)
+
+# Halaman dataset
+review.add_url_rule(
+    "/admin/dataset",
+    view_func=reviewController.dataset,
+    methods=["GET"]
 )

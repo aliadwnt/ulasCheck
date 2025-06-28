@@ -1,6 +1,5 @@
 from datetime import datetime
 from app import db
-from sqlalchemy.dialects.mysql import LONGBLOB
 
 class Review(db.Model):
     __tablename__ = "review"
@@ -9,13 +8,10 @@ class Review(db.Model):
     shop_id = db.Column(db.String(255))
     shop_url = db.Column(db.String(255))
     file = db.Column(db.String(255))
-    file_data = db.Column(LONGBLOB)
-    
+    file_data = db.Column(db.LargeBinary)
+
     createdAt = db.Column(db.DateTime, default=datetime.utcnow)
     updatedAt = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
-    # Relasi ke hasil prediksi
+    # INI HARUS ADA
     predictions = db.relationship('Prediction', backref='review', lazy=True)
-
-    def __repr__(self):
-        return f"<Review {self.id} - Shop {self.shop_id}>"

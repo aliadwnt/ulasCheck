@@ -19,7 +19,7 @@ def create_app():
     from app.routes.datasetRoutes import dataset  
     from app.routes.evaluationRoutes import evaluation  
     from app.routes.analyzeRoutes import analyze
-    from app.routes.predictionRoutes import prediction     
+    from app.routes.predictionRoutes import prediction   
 
     app.register_blueprint(main)    
     app.register_blueprint(admin)  
@@ -30,6 +30,6 @@ def create_app():
     app.register_blueprint(analyze)
     app.register_blueprint(prediction)
 
-    from app.models import userModel, reviewModel, evaluationModel, datasetModel
+    from app.models import userModel, reviewModel, evaluationModel, datasetModel, predictionModel
 
     return app

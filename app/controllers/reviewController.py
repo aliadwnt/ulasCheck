@@ -1,13 +1,18 @@
 from flask import render_template, abort, flash, redirect, send_file, request, session, url_for, jsonify
 from app.models.reviewModel import Review
+from app.models.predictionModel import Prediction
 import pandas as pd
 from app import db
 import io, pytz
 from datetime import datetime
+from sqlalchemy.orm import joinedload
 
 # ✅ Tampilkan semua riwayat review
 def show_reviews():
-    reviews = Review.query.order_by(Review.updatedAt.desc()).all()
+    reviews = Review.query.options(
+        joinedload(Review.predictions)
+    ).order_by(Review.updatedAt.desc()).all()
+    
     return render_template("pages/admin/history.html", reviews=reviews)
 
 # ✅ Download file review sebagai CSV

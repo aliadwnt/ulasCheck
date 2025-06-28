@@ -232,7 +232,7 @@
       <div class="mt-6 p-4 bg-orange-50 border-l-4 border-orange-400 rounded">
         {% set aspek_tertinggi = (result.aspek_persen.items() | sort(attribute=1, reverse=True))[0] %}
         <p class="text-sm text-orange-700 font-medium">
-          Berdasarkan hasil analisis, toko ini paling menawarkan keunggulan dalam kategori <span class="font-semibold">{{ aspek_tertinggi[0] }}</span> dengan persentase <span class="font-semibold">{{ aspek_tertinggi[1] }}%</span>.
+          Berdasarkan hasil analisis, toko ini menawarkan keunggulan dalam kategori <span class="font-semibold">{{ aspek_tertinggi[0] }}</span> dengan persentase <span class="font-semibold">{{ aspek_tertinggi[1] }}%</span>.
         </p>
       </div>
 

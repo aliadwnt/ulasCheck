@@ -16,7 +16,21 @@ class Evaluation(db.Model):
     negatif = db.Column(db.Integer, nullable=True)
     persen_positif = db.Column(db.Float, nullable=True)
     label_toko = db.Column(db.String(50), nullable=True)
-    aspek_tertinggi = db.Column(db.String(100), nullable=True)
-    jumlah_aspek = db.Column(db.Integer, nullable=True)
-    persen_aspek = db.Column(db.Float, nullable=True)
     evaluationAt = db.Column(db.DateTime, default=datetime.utcnow)
+
+    def to_dict(self):
+        return {
+            "id": self.id,
+            "model_name": self.model_name,
+            "accuracy": self.accuracy,
+            "precision": self.precision,
+            "recall": self.recall,
+            "f1_score": self.f1_score,
+            "training_time": self.training_time,
+            "total_review": self.total_review,
+            "positif": self.positif,
+            "negatif": self.negatif,
+            "persen_positif": self.persen_positif,
+            "label_toko": self.label_toko,
+            "evaluationAt": self.evaluationAt.strftime('%Y-%m-%d %H:%M:%S')
+        }

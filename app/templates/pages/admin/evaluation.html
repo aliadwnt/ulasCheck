@@ -1,16 +1,24 @@
 <!DOCTYPE html>
 <html lang="id">
+
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Shopeera - Evaluasi Model</title>
+  <title>Shoperra - Evaluasi Model</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet" />
   <style>
-    body { font-family: 'Poppins', sans-serif; }
+    body {
+      font-family: 'Poppins', sans-serif;
+    }
+
+    #chart-container {
+      transition: all 0.3s ease-in-out;
+    }
   </style>
 </head>
+
 <body class="bg-gray-100 min-h-screen">
   <div class="flex min-h-screen">
     {% include 'components/sidebar.html' %}
@@ -21,212 +29,250 @@
         <div class="bg-white p-6 rounded-lg shadow-lg max-w-7xl mx-auto">
           <h1 class="text-2xl font-bold text-gray-800 mb-6">📊 Evaluasi Model</h1>
 
-          <!-- Grafik 2 Kolom -->
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-10 justify-center">
-            <!-- Pie Chart -->
-            <div class="bg-gray-50 p-4 rounded-xl shadow-md flex flex-col items-center w-full md:w-auto">
-              <h2 class="text-center font-semibold text-gray-700 mb-2">Distribusi Rekomendasi Toko</h2>
-              <canvas id="pieChart" width="160" height="160"></canvas>
-            </div>
+          <!-- Grid 2 Kolom -->
+          <div id="content-grid" class="grid grid-cols-1 md:grid-cols-1 gap-6 mb-10 justify-center">
 
-            <!-- Bar Chart -->
-            <div class="bg-gray-50 p-4 rounded-xl shadow-md flex flex-col items-center w-full md:w-auto">
-              <h2 class="text-center font-semibold text-gray-700 mb-2">Perbandingan Metrik Evaluasi Model</h2>
-              <canvas id="evalChart" width="320" height="200"></canvas>
-            </div>
-          </div>
-
-
-          <!-- Tabel Evaluasi -->
-            <div class="overflow-x-auto">
+            <!-- Tabel Evaluasi -->
+            <div id="table-container" class="w-full overflow-x-auto transition-all duration-300">
               <h2 class="text-lg font-semibold text-gray-700 mb-3">Detail Evaluasi</h2>
               <table class="min-w-full border text-sm text-center">
                 <thead class="bg-gray-200 font-semibold text-gray-700">
-                  <tr>
-                    <th class="border px-4 py-2">Tanggal Evaluasi</th>
-                    <th class="border px-4 py-2">Model</th>
-                    <th class="border px-4 py-2">Akurasi</th>
-                    <th class="border px-4 py-2">Presisi</th>
-                    <th class="border px-4 py-2">Recall</th>
-                    <th class="border px-4 py-2">F1 Score</th>
-                    <th class="border px-4 py-2">Waktu Proses (s)</th>
+                  <tr class="text-xs">
+                    <th class="border px-2 py-1">Tanggal Evaluasi</th>
+                    <th class="border px-2 py-1">Model</th>
+                    <th class="border px-2 py-1">Akurasi</th>
+                    <th class="border px-2 py-1">Presisi</th>
+                    <th class="border px-2 py-1">Recall</th>
+                    <th class="border px-2 py-1">F1 Score</th>
+                    <th class="border px-2 py-1">Waktu Proses (s)</th>
+                    <th class="border px-2 py-1">Aksi</th>
                   </tr>
                 </thead>
-                <tbody id="evaluation-table" class="bg-white">
+                <tbody id="evaluation-table" class="bg-white text-xs">
                   {% for row in logs %}
                   <tr>
-                    <td class="border px-4 py-2">{{ row.evaluationAt.strftime('%d-%m-%Y %H:%M') }}</td>
-                    <td class="border px-4 py-2">{{ row.model_name }}</td>
-                    <td class="border px-4 py-2">{{ (row.accuracy * 100) | round(2) }}%</td>
-                    <td class="border px-4 py-2">{{ (row.precision * 100) | round(2) }}%</td>
-                    <td class="border px-4 py-2">{{ (row.recall * 100) | round(2) }}%</td>
-                    <td class="border px-4 py-2">{{ (row.f1_score * 100) | round(2) }}%</td>
-                    <td class="border px-4 py-2">{{ row.training_time or '-' }}</td>
+                    <td class="border px-2 py-1">{{ row.evaluationAt.strftime('%d-%m-%Y %H:%M') }}</td>
+                    <td class="border px-2 py-1">{{ row.model_name }}</td>
+                    <td class="border px-2 py-1">{{ (row.accuracy * 100) | round(2) }}%</td>
+                    <td class="border px-2 py-1">{{ (row.precision * 100) | round(2) }}%</td>
+                    <td class="border px-2 py-1">{{ (row.recall * 100) | round(2) }}%</td>
+                    <td class="border px-2 py-1">{{ (row.f1_score * 100) | round(2) }}%</td>
+                    <td class="border px-2 py-1">{{ row.training_time or '-' }}</td>
+                    <td class="border px-2 py-1 flex justify-center gap-2">
+                      <button onclick="showCharts({
+                          model_name: '{{ row.model_name }}',
+                          accuracy: {{ row.accuracy }},
+                          precision: {{ row.precision }},
+                          recall: {{ row.recall }},
+                          f1_score: {{ row.f1_score }}
+                        })"
+                        class="bg-blue-500 text-white px-2 py-1 rounded text-xs hover:bg-blue-600 flex items-center gap-1">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none"
+                          viewBox="0 0 24 24" stroke="currentColor">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M2.458 12C3.732 7.943 7.523 5 12 5s8.268 2.943 9.542 7c-1.274 4.057-5.065 7-9.542 7s-8.268-2.943-9.542-7z" />
+                        </svg>
+                      </button>
+
+                      <button onclick="deleteEvaluation('{{ row.id }}')"
+                        class="bg-red-500 text-white px-2 py-1 rounded text-xs hover:bg-red-600 flex items-center gap-1">
+                      <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6M9 7h6m2 0a2 2 0 00-2-2H9a2 2 0 00-2 2h10z" />
+                        </svg>
+                      </button>
+                  </td>
+
                   </tr>
                   {% endfor %}
                 </tbody>
               </table>
+
               <div id="pagination" class="mt-4 flex justify-end items-center space-x-1 text-sm font-medium"></div>
             </div>
+
+            <!-- Bar Chart (Disembunyikan) -->
+          <div id="chart-container" class="flex flex-col items-center w-full md:w-auto relative" style="display: none;">
+          <!-- Tombol X -->
+          <button onclick="hideCharts()" class="absolute top-2 right-2 text-gray-500 hover:text-gray-700 text-lg font-bold">
+            ✕
+          </button>
+
+          <h2 id="chart-title" class="text-center font-semibold text-gray-700 mb-2">
+            Perbandingan Metrik Evaluasi Model
+          </h2>
+
+          <canvas id="evalChart" width="320" height="200"></canvas>
+        </div>
+
+          </div>
         </div>
       </main>
     </div>
   </div>
 
-  <!-- Data JSON untuk Chart -->
-  <script id="eval-data" type="application/json">
-    {
-      "labels": {{ logs | map(attribute='model_name') | list | tojson }},
-      "accuracy": {{ logs | map(attribute='accuracy') | list | tojson }},
-      "precision": {{ logs | map(attribute='precision') | list | tojson }},
-      "recall": {{ logs | map(attribute='recall') | list | tojson }},
-      "f1": {{ logs | map(attribute='f1_score') | list | tojson }}
-    }
-  </script>
-
-  <script id="pie-data" type="application/json">
-    {
-      "labels": ["Toko Direkomendasikan", "Toko Tidak Direkomendasikan"],
-      "counts": [
-        {{ logs | selectattr("label_toko", "equalto", "Toko Direkomendasikan") | list | length }},
-        {{ logs | selectattr("label_toko", "equalto", "Toko Tidak Direkomendasikan") | list | length }}
-      ]
-    }
-  </script>
-
-  
-  <!-- Script Chart.js -->
+  <!-- Pagination -->
   <script>
-    const evalData = JSON.parse(document.getElementById("eval-data").textContent);
-    const pieData = JSON.parse(document.getElementById("pie-data").textContent);
+    document.addEventListener("DOMContentLoaded", function () {
+  const rows = document.querySelectorAll("#evaluation-table tr"); // ini yang bener
 
-    if (evalData.labels.length > 0) {
-      new Chart(document.getElementById("evalChart").getContext("2d"), {
-        type: "bar",
-        data: {
-          labels: evalData.labels,
-          datasets: [
-            { label: "Akurasi", data: evalData.accuracy.map(x => x * 100), backgroundColor: "#3b82f6" },
-            { label: "Presisi", data: evalData.precision.map(x => x * 100), backgroundColor: "#10b981" },
-            { label: "Recall", data: evalData.recall.map(x => x * 100), backgroundColor: "#facc15" },
-            { label: "F1 Score", data: evalData.f1.map(x => x * 100), backgroundColor: "#ef4444" }
-          ]
-        },
-        options: {
-          responsive: true,
-          plugins: {
-            legend: { position: 'top' },
-            title: { display: true, text: 'Perbandingan Evaluasi Model' }
-          },
-          scales: {
-            y: {
-              beginAtZero: true,
-              max: 100,
-              title: { display: true, text: 'Persentase (%)' }
-            }
-          }
-        }
-      });
+  if (rows.length === 0) return; // Tambahan proteksi kalau data kosong
+
+  const rowsPerPage = 5;
+  const pageCount = Math.ceil(rows.length / rowsPerPage);
+  const pagination = document.getElementById("pagination");
+  let currentPage = 1;
+
+  function displayPage(page) {
+    const start = (page - 1) * rowsPerPage;
+    const end = start + rowsPerPage;
+
+    rows.forEach((row, index) => {
+      row.style.display = index >= start && index < end ? "" : "none";
+    });
+
+    renderPagination(page);
+  }
+
+  function createPageButton(text, pageNumber) {
+    const btn = document.createElement("button");
+    btn.textContent = text;
+    btn.className = "px-2 py-1 text-sm text-gray-700";
+    btn.addEventListener("click", function () {
+      if (pageNumber >= 1 && pageNumber <= pageCount) {
+        currentPage = pageNumber;
+        displayPage(currentPage);
+      }
+    });
+    return btn;
+  }
+
+  function renderPagination(activePage) {
+    pagination.innerHTML = "";
+
+    const pagesToShow = 5;
+    let startPage = Math.max(1, activePage - 2);
+    let endPage = Math.min(startPage + pagesToShow - 1, pageCount);
+
+    if (endPage - startPage < pagesToShow - 1) {
+      startPage = Math.max(1, endPage - pagesToShow + 1);
     }
 
-    if (pieData.labels.length > 0) {
-      new Chart(document.getElementById("pieChart").getContext("2d"), {
-        type: "pie",
-        data: {
-          labels: pieData.labels,
-          datasets: [{
-            data: pieData.counts,
-            backgroundColor: ["#34d399", "#f87171"]
-          }]
-        },
-        options: {
-          responsive: true,
-          plugins: {
-            title: {
-              display: true,
-              text: 'Toko Direkomendasikan vs Tidak'
-            },
-            legend: {
-              position: 'bottom'
-            }
-          }
-        }
-      });
+    if (startPage > 1) {
+      const prevBtn = createPageButton("<", activePage - 1);
+      prevBtn.classList.add("hover:font-bold", "mr-2");
+      pagination.appendChild(prevBtn);
     }
+
+    for (let i = startPage; i <= endPage; i++) {
+      const btn = createPageButton(i, i);
+      btn.className += (i === activePage)
+        ? " underline underline-offset-4 font-semibold text-orange-600"
+        : " hover:underline";
+      pagination.appendChild(btn);
+    }
+
+    if (endPage < pageCount) {
+      const nextBtn = createPageButton(">", activePage + 1);
+      nextBtn.classList.add("hover:font-bold", "ml-2");
+      pagination.appendChild(nextBtn);
+    }
+  }
+
+  displayPage(currentPage);
+});
   </script>
-  
-  <!-- pagination -->
+
+  <!-- Chart Logic -->
   <script>
-  document.addEventListener("DOMContentLoaded", function () {
-    const rows = document.querySelectorAll("#evaluation-table tr");
-    const rowsPerPage = 5;
-    const pageCount = Math.ceil(rows.length / rowsPerPage);
-    const pagination = document.getElementById("pagination");
-    let currentPage = 1;
+    let barChartInstance = null;
 
-    function displayPage(page) {
-      const start = (page - 1) * rowsPerPage;
-      const end = start + rowsPerPage;
+    function showCharts(data) {
+  const chartContainer = document.getElementById('chart-container');
+  const contentGrid = document.getElementById('content-grid');
 
-      rows.forEach((row, index) => {
-        row.style.display = index >= start && index < end ? "" : "none";
-      });
+  // Ubah grid menjadi 2 kolom
+  contentGrid.classList.remove('md:grid-cols-1');
+  contentGrid.classList.add('md:grid-cols-2');
 
-      renderPagination(page);
-    }
+  // Tampilkan chart
+  chartContainer.style.display = 'flex'; // Ini ganti dari display: none jadi flex
 
-    function createPageButton(text, pageNumber) {
-      const btn = document.createElement("button");
-      btn.textContent = text;
-      btn.className = "px-2 py-1 text-sm text-gray-700";
-      btn.addEventListener("click", function () {
-        if (pageNumber >= 1 && pageNumber <= pageCount) {
-          currentPage = pageNumber;
-          displayPage(currentPage);
+  // Tambahkan animasi jika mau smooth
+  chartContainer.classList.remove('opacity-0');
+
+  if (barChartInstance) barChartInstance.destroy();
+
+  const barCtx = document.getElementById("evalChart").getContext("2d");
+
+  barChartInstance = new Chart(barCtx, {
+    type: "bar",
+    data: {
+      labels: ["Akurasi", "Presisi", "Recall", "F1 Score"],
+      datasets: [{
+        label: data.model_name,
+        data: [
+          data.accuracy * 100,
+          data.precision * 100,
+          data.recall * 100,
+          data.f1_score * 100
+        ],
+        backgroundColor: ["#3b82f6", "#10b981", "#facc15", "#ef4444"]
+      }]
+    },
+    options: {
+      responsive: true,
+      plugins: {
+        legend: { display: false },
+        title: { display: true, text: `Detail Evaluasi Model: ${data.model_name}` }
+      },
+      scales: {
+        y: {
+          beginAtZero: true,
+          max: 100,
+          title: { display: true, text: 'Persentase (%)' }
         }
-      });
-      return btn;
-    }
-
-    function renderPagination(activePage) {
-      pagination.innerHTML = "";
-
-      const pagesToShow = 5;
-      let startPage = Math.max(1, activePage - 2);
-      let endPage = Math.min(startPage + pagesToShow - 1, pageCount);
-
-      if (endPage - startPage < pagesToShow - 1) {
-        startPage = Math.max(1, endPage - pagesToShow + 1);
-      }
-
-      // Tombol ke halaman sebelumnya
-      if (startPage > 1) {
-        const prevBtn = createPageButton("<", activePage - 1);
-        prevBtn.classList.add("hover:font-bold", "mr-2");
-        pagination.appendChild(prevBtn);
-      }
-
-      // Angka halaman
-      for (let i = startPage; i <= endPage; i++) {
-        const btn = createPageButton(i, i);
-        btn.className += (i === activePage)
-          ? " underline underline-offset-4 font-semibold text-orange-600"
-          : " hover:underline";
-        pagination.appendChild(btn);
-      }
-
-      // Tombol ke halaman selanjutnya
-      if (endPage < pageCount) {
-        const nextBtn = createPageButton(">", activePage + 1);
-        nextBtn.classList.add("hover:font-bold", "ml-2");
-        pagination.appendChild(nextBtn);
       }
     }
-
-    // Inisialisasi pertama kali
-    displayPage(currentPage);
   });
-</script>
+}
+
+  function hideCharts() {
+  const chartContainer = document.getElementById('chart-container');
+  const contentGrid = document.getElementById('content-grid');
+
+  // Ubah grid jadi 1 kolom lagi
+  contentGrid.classList.remove('md:grid-cols-2');
+  contentGrid.classList.add('md:grid-cols-1');
+
+  // Sembunyikan chart
+  chartContainer.style.display = 'none';
+}
+
+  </script>
+
+  <!-- Delete Logic -->
+  <script>
+    async function deleteEvaluation(id) {
+      if (!confirm("Yakin ingin menghapus data evaluasi ini?")) return;
+
+      try {
+        const response = await fetch(`/admin/evaluation/delete/${id}`, { method: "POST" });
+
+        if (response.ok) {
+          alert("Data berhasil dihapus.");
+          location.reload();
+        } else {
+          alert("Gagal menghapus data.");
+        }
+      } catch (err) {
+        alert("Terjadi kesalahan saat menghapus data.");
+      }
+    }
+  </script>
 
 </body>
+
 </html>

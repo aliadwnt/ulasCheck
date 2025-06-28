@@ -39,6 +39,7 @@
                             <thead>
                             <tr class="bg-gray-200 text-sm font-semibold text-gray-700">
                                 <th class="border px-4 py-2">No</th>
+                                <th class="border px-4 py-2">URL Toko</th> 
                                 <th class="border px-4 py-2">ID Toko</th>
                                 <th class="border px-4 py-2">Status</th>
                                 <th class="border px-4 py-2">File Ulasan</th>
@@ -49,6 +50,17 @@
                             {% for review in reviews %}
                             <tr class="text-center">
                                 <td class="border px-4 py-2">{{ loop.index }}</td>
+                               <td class="border px-4 py-2 max-w-[200px]">
+                                    <a 
+                                        href="{{ review.shop_url }}" 
+                                        target="_blank" 
+                                        rel="noopener noreferrer"
+                                        class="text-blue-600 hover:underline"
+                                        title="{{ review.shop_url }}"
+                                    >
+                                        {{ review.shop_url[:14] ~ ('...' if review.shop_url|length > 14 else '') }}
+                                    </a>
+                                </td>
                                 <td class="border px-4 py-2">{{ review.shop_id }}</td>
                                <td class="border px-4 py-2 text-center">
                             {% if review.predictions %}
@@ -97,39 +109,36 @@
                         <div id="pagination" class="mt-4 mb-4 flex justify-end items-center space-x-2 text-sm text-orange-800 font-medium"></div>
                        
                             <!-- Modal Detail dengan Transisi -->
-                            <div id="modalDetail" class="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm hidden items-center justify-center z-50">
-    <div id="modalContent" class="bg-white p-6 rounded-lg w-full max-w-3xl relative transform scale-75 opacity-0 transition-all duration-300 ease-in-out">
-        <h2 class="text-2xl font-bold mb-4 text-orange-600 text-center">Detail Analisis</h2>
-        <div class="flex flex-col md:flex-row gap-6 items-center">
-            <!-- Pie Chart -->
-            <div class="w-full md:w-1/2">
-                <canvas id="pieChart" width="200" height="200"></canvas>
-            </div>
+                    <div id="modalDetail" class="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm hidden items-center justify-center z-50">
+                        <div id="modalContent" class="bg-white p-6 rounded-lg w-full max-w-3xl relative transform scale-75 opacity-0 transition-all duration-300 ease-in-out">
+                            <h2 class="text-2xl font-bold mb-4 text-orange-600 text-center">Detail Analisis</h2>
+                            <div class="flex flex-col md:flex-row gap-6 items-center">
+                                <!-- Pie Chart -->
+                                <div class="w-full md:w-1/2">
+                                    <canvas id="pieChart" width="200" height="200"></canvas>
+                                </div>
 
-            <!-- Detail Info -->
-            <div class="w-full md:w-1/2 text-gray-700 text-sm">
-                <ul class="space-y-2">
-                    <li><strong>KKategori eunggulan Toko : </strong> <span id="aspekDetail"></span></li>
-                    <li><strong>Persentase Aspek:</strong> <span id="persentaseDetail"></span>%</li>
-                    <li><strong>Label Toko:</strong> <span id="labelDetail"></span></li>
-                    <li><strong>Total Review Positif:</strong> <span id="positifDetail"></span></li>
-                    <li><strong>Total Review Negatif:</strong> <span id="negatifDetail"></span></li>
-                    <li><strong>Total Semua Review:</strong> <span id="totalDetail"></span></li>
-                </ul>
-            </div>
-        </div>
-        <div class="flex justify-center mt-6">
-            <button onclick="closeDetailModal()" class="px-6 py-2 bg-orange-600 text-white rounded-full hover:bg-orange-700 transition">
-                Tutup
-            </button>
-        </div>
-        <button onclick="closeDetailModal()" class="absolute top-2 right-3 text-gray-600 hover:text-red-500 text-xl">×</button>
-    </div>
-</div>
-
+                                <!-- Detail Info -->
+                                <div class="w-full md:w-1/2 text-gray-700 text-sm">
+                                    <ul class="space-y-2">
+                                        <li><strong>Kategori eunggulan Toko : </strong> <span id="aspekDetail"></span></li>
+                                        <li><strong>Persentase Aspek:</strong> <span id="persentaseDetail"></span>%</li>
+                                        <li><strong>Label Toko:</strong> <span id="labelDetail"></span></li>
+                                        <li><strong>Total Review Positif:</strong> <span id="positifDetail"></span></li>
+                                        <li><strong>Total Review Negatif:</strong> <span id="negatifDetail"></span></li>
+                                        <li><strong>Total Semua Review:</strong> <span id="totalDetail"></span></li>
+                                    </ul>
+                                </div>
                             </div>
-
-
+                                <div class="flex justify-center mt-6">
+                                            <button onclick="closeDetailModal()" class="px-6 py-2 bg-orange-600 text-white rounded-full hover:bg-orange-700 transition">
+                                                Tutup
+                                            </button>
+                                        </div>
+                                        <button onclick="closeDetailModal()" class="absolute top-2 right-3 text-gray-600 hover:text-red-500 text-xl">×</button>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>

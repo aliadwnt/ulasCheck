@@ -1,4 +1,4 @@
-from flask import redirect, url_for, flash, render_template
+from flask import render_template, redirect, url_for, flash, jsonify
 from app.models.datasetModel import Dataset
 from app.models.evaluationModel import Evaluation
 from app.analyze import clean_text, vectorizer, model
@@ -10,11 +10,16 @@ from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_sc
 import time
 
 
-def evaluate_model():
+# Tampilkan halaman evaluasi
+def show_evaluation():
+    logs = Evaluation.query.order_by(Evaluation.evaluationAt.desc()).all()
+    return render_template('pages/admin/evaluation.html', logs=logs)
+
+def start_evaluate():
     data = Dataset.query.all()
     if not data:
         flash("Tidak ada data untuk evaluasi.", "danger")
-        return redirect("/admin/dataset")
+        return redirect(url_for('dataset.show_dataset'))
 
     start_time = time.time()
 
@@ -56,8 +61,73 @@ def evaluate_model():
     db.session.commit()
 
     flash("Evaluasi berhasil dilakukan.", "success")
-    return redirect("/evaluation")
+    return redirect(url_for('evaluation.show_evaluation'))
 
-def show_evaluation():
-    logs = Evaluation.query.order_by(Evaluation.evaluationAt.desc()).all()
-    return render_template("pages/admin/evaluation.html", logs=logs)
+# Evaluasi model
+def evaluate_model():
+    data = Dataset.query.all()
+    if not data:
+        flash("Tidak ada data untuk evaluasi.", "danger")
+        return redirect(url_for('dataset.show_dataset'))
+
+    start_time = time.time()
+
+    df = pd.DataFrame([{
+        "review": d.review,
+        "rating": d.rating
+    } for d in data])
+
+    df["clean"] = df["review"].apply(clean_text)
+    df.dropna(subset=["clean", "rating"], inplace=True)
+
+    X = vectorizer.transform(df["clean"])
+    y_true = (df["rating"] >= 4).astype(int)
+    y_pred = model.predict(X)
+
+    acc = round(accuracy_score(y_true, y_pred), 4)
+    prec = round(precision_score(y_true, y_pred), 4)
+    rec = round(recall_score(y_true, y_pred), 4)
+    f1 = round(f1_score(y_true, y_pred), 4)
+
+    duration = round(time.time() - start_time, 2)
+
+    log = Evaluation(
+        model_name="SVM",
+        accuracy=acc,
+        precision=prec,
+        recall=rec,
+        f1_score=f1,
+        training_time=duration,
+        total_review=len(df),
+        positif=int((y_true == 1).sum()),
+        negatif=int((y_true == 0).sum()),
+        persen_positif=round((y_true == 1).mean() * 100, 2),
+        label_toko="Toko Direkomendasikan" if (y_true == 1).mean() >= 0.5 else "Toko Tidak Direkomendasikan",
+        evaluationAt=datetime.now()
+    )
+
+    db.session.add(log)
+    db.session.commit()
+
+    flash("Evaluasi berhasil dilakukan.", "success")
+    return redirect(url_for('evaluation.show_evaluation'))
+
+
+# Ambil data evaluasi berdasarkan ID
+def get_evaluation(id):
+    evaluation = Evaluation.query.get_or_404(id)
+    return jsonify(evaluation.to_dict())
+
+
+def delete_evaluation(id):
+    try:
+        evaluation = Evaluation.query.get(id)
+        if not evaluation:
+            return jsonify({"success": False, "message": "Data evaluasi tidak ditemukan."}), 404
+
+        db.session.delete(evaluation)
+        db.session.commit()
+        return jsonify({"success": True, "message": "Data evaluasi berhasil dihapus."}), 200
+
+    except Exception as e:
+        return jsonify({"success": False, "message": f"Terjadi kesalahan: {str(e)}"}), 500

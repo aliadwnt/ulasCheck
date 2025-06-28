@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Shopeera - Dataset</title>
+  <title>Shoperra - Dataset</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet" />
   <style>
@@ -52,11 +52,16 @@
           Evaluation
         </button>
 
-        <!-- Tambah Data -->
-        <button onclick="openAddModal()" class="bg-orange-600 text-white px-4 py-2 rounded hover:bg-orange-700 text-sm flex items-center gap-2">
-          + Tambah Data
+        <button onclick="openUploadModal()" class="bg-orange-600 text-white px-4 py-2 rounded hover:bg-orange-700 text-sm flex items-center gap-2">
+            Upload CSV
         </button>
       </div>
+      <!-- Ringkasan Rating -->
+      <div class="mb-6 mt-4 w-1/4">
+        <div id="ratingSummary" class="space-y-2"></div>
+      </div>
+
+
         <div class="overflow-x-auto mt-4">
           <table class="min-w-full table-auto text-sm border-collapse">
             <thead class="bg-gray-200 text-gray-700 font-semibold">
@@ -81,17 +86,6 @@
                 <td class="border px-4 py-2">{{ row.reviewAt }}</td>
                 <td class="border px-4 py-2">
                   <div class="flex flex-wrap justify-center items-center gap-2">
-                    <button
-                      onclick="openEditModal('{{ row.id }}', '{{ row.username }}', '{{ row.product }}', `{{ row.review }}`, '{{ row.rating }}', '{{ row.reviewAt }}')"
-                      class="bg-yellow-400 text-white px-2 py-1 rounded text-xs hover:bg-yellow-500 flex items-center gap-1"
-                      title="Edit"
-                    >
-                      <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                          d="M15.232 5.232l3.536 3.536M9 13l6-6m2-2a2.828 2.828 0 114 4L9 21H5v-4L17.232 5.232z" />
-                      </svg>
-                    </button>
-
                     <!-- Tombol Hapus -->
                     <button
                       onclick="deleteData('{{ row.id }}')"
@@ -112,6 +106,23 @@
          <div id="pagination" class="mt-4 flex justify-end items-center space-x-1 text-sm font-medium"></div>
       </div>
 
+      <!-- Modal Upload CSV -->
+      <div id="modalUpload" class="fixed inset-0 hidden bg-black bg-opacity-50 items-center justify-center z-50">
+        <div class="bg-white p-6 rounded-lg w-full max-w-md relative">
+          <h2 class="text-xl font-bold mb-4 text-center text-orange-600">Upload Dataset CSV</h2>
+          <form id="uploadForm" enctype="multipart/form-data">
+            <div class="mb-4">
+              <label class="block text-sm font-medium mb-1">Pilih File (.csv)</label>
+              <input type="file" name="file" accept=".csv" class="w-full border px-3 py-2 rounded" required>
+            </div>
+            <div class="flex justify-end space-x-2">
+              <button type="button" onclick="closeUploadModal()" class="px-4 py-2 bg-gray-300 rounded">Batal</button>
+              <button type="submit" class="px-4 py-2 bg-orange-600 text-white rounded hover:bg-orange-700">Upload</button>
+            </div>
+          </form>
+          <button onclick="closeUploadModal()" class="absolute top-2 right-3 text-gray-600 hover:text-red-500 text-xl">×</button>
+        </div>
+      </div>
       <!-- Modal Form -->
       <div id="modalForm" class="fixed inset-0 hidden bg-black bg-opacity-50 items-center justify-center z-50">
         <div class="bg-white p-6 rounded-lg w-full max-w-md relative">
@@ -213,7 +224,7 @@
         async function evaluateModel() {
         if (!confirm("Lakukan evaluasi model dengan dataset saat ini?")) return;
         try {
-          const response = await fetch("/evaluation/start", {
+          const response = await fetch("/admin/evaluation/start", {
             method: "POST",
           });
           if (response.redirected) {
@@ -245,6 +256,93 @@
           row.style.display = matchKeyword && matchRating ? "" : "none";
         });
       }
+
+      // Fungsi untuk menghitung dan menampilkan distribusi rating
+function displayRatingSummary() {
+  const rows = document.querySelectorAll("#tableBody tr");
+  const ratingCounts = { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 };
+  let total = 0;
+
+  rows.forEach(row => {
+    const ratingText = row.children[4]?.textContent.replace("★", "").trim();
+    const rating = parseInt(ratingText);
+    if (rating >= 1 && rating <= 5) {
+      ratingCounts[rating]++;
+      total++;
+    }
+  });
+
+  const summaryContainer = document.getElementById("ratingSummary");
+  summaryContainer.innerHTML = "";
+
+  for (let i = 5; i >= 1; i--) {
+    const percentage = total > 0 ? ((ratingCounts[i] / total) * 100).toFixed(1) : 0;
+
+    const ratingRow = document.createElement("div");
+    ratingRow.className = "flex items-center space-x-2";
+
+    const label = document.createElement("span");
+    label.className = "w-16 text-sm font-medium text-gray-700";
+    label.innerHTML = `&#9733; ${i}`;
+
+    const progressBar = document.createElement("div");
+    progressBar.className = "flex-1 bg-gray-300 rounded h-4 overflow-hidden";
+
+    const progress = document.createElement("div");
+    progress.style.width = `${percentage}%`;
+    progress.className = "bg-orange-500 h-full";
+
+    const percentLabel = document.createElement("span");
+    percentLabel.className = "text-sm text-gray-600 w-12 text-right";
+    percentLabel.textContent = `${percentage}%`;
+
+    progressBar.appendChild(progress);
+    ratingRow.appendChild(label);
+    ratingRow.appendChild(progressBar);
+    ratingRow.appendChild(percentLabel);
+
+    summaryContainer.appendChild(ratingRow);
+  }
+}
+
+// Tampilkan distribusi saat halaman selesai dimuat
+document.addEventListener("DOMContentLoaded", function () {
+  displayRatingSummary();
+});
+
+  function openUploadModal() {
+    document.getElementById("modalUpload").classList.remove("hidden");
+    document.getElementById("modalUpload").classList.add("flex");
+  }
+
+  function closeUploadModal() {
+    document.getElementById("modalUpload").classList.add("hidden");
+    document.getElementById("modalUpload").classList.remove("flex");
+  }
+
+  document.getElementById("uploadForm").addEventListener("submit", async function (e) {
+    e.preventDefault();
+    const formData = new FormData(this);
+
+    try {
+        const response = await fetch("/admin/dataset/upload", {
+            method: "POST",
+            body: formData,
+        });
+        const result = await response.json();
+
+        if (response.ok) {
+            alert(result.message);
+            location.reload();
+        } else {
+            alert(result.message);
+        }
+    } catch (err) {
+        alert("Terjadi kesalahan saat upload.");
+    }
+});
+
+
 
       // Event listener
       document.getElementById("searchInput").addEventListener("input", applyFilters);

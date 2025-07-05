@@ -20,6 +20,12 @@
           placeholder="Masukkan link ulasan toko shopee"
           required
         />
+       <small class="text-sm text-gray-600">
+        Tidak tahu cara mendapatkan link Shopee? 
+        <a href="#" onclick="showModal('panduanModal')" class="text-orange-600 hover:underline">
+          Lihat Panduan
+        </a>
+      </small>
         <div class="flex space-x-4">
           <button id="scrapeBtn" type="submit" class="bg-orange-600 hover:bg-orange-700 text-white py-2 px-4 rounded transition">
             Scrape
@@ -65,7 +71,9 @@
               <td class="border px-2 py-2 text-center">{{ loop.index }}</td>
               <td class="border px-2 py-2">{{ row.Username }}</td>
               <td class="border px-2 py-2 max-w-[150px] truncate" title="{{ row.Produk }}">{{ row.Produk }}</td>
-              <td class="border px-2 py-2 max-w-[150px] truncate" title="{{ row.Review }}">{{ row.Review }}</td>
+              <td class="border px-2 py-2 max-w-[150px] truncate" title="{{ row.Review }}">
+                {{ row.Review | replace(':', ' ') | replace(',', ' ') | replace('.', ' ') | replace('!', ' ') | replace('?', ' ') | replace(';', ' ') | replace('-', ' ') }}
+              </td>
               <td class="border px-2 py-2">{{ row.Rating }}</td>
               <td class="border px-2 py-2">{{ row.ReviewAt }}</td>
             </tr>
@@ -243,12 +251,73 @@
 
 
       {% endif %}
+<!-- Modal Panduan Link Shopee -->
+<div id="panduanModal" class="fixed inset-0 bg-black bg-opacity-50 items-center justify-center z-50 hidden">
+  <div class="bg-white p-6 rounded-lg shadow-xl max-w-lg w-full relative transition-transform duration-300 transform scale-100">
+
+    <!-- Tombol Close -->
+    <button
+      onclick="hideModal('panduanModal')"
+      class="absolute top-3 right-3 text-gray-400 hover:text-gray-700 text-lg"
+    >
+      ✖
+    </button>
+
+    <!-- Judul -->
+    <h2 class="text-xl font-bold text-orange-800 mb-4">🔍 Cara Mendapatkan Link Ulasan Toko Shopee</h2>
+
+    <!-- Isi Panduan -->
+    <div class="space-y-4 text-sm text-gray-700 leading-relaxed">
+      <p>
+        Untuk melakukan analisis ulasan suatu toko di Shopee, kamu perlu memasukkan link halaman penilaian toko.
+        <br>Ikuti langkah-langkah berikut:</br>
+      </p>
+      <ol class="list-decimal pl-5 space-y-2">
+        <li>
+          Buka website shopee
+          <a href="https://shopee.co.id/" target="_blank" class="text-blue-600 underline hover:text-blue-800">
+            https://shopee.co.id/
+          </a>
+        </li>
+        <li>
+          Cari dan klik nama toko yang ingin kamu analisis.
+        </li>
+        <li>
+          Setelah masuk ke halaman toko, klik tab <strong>"Penilaian"</strong> atau <em>"Rating"</em>.
+        </li>
+        <li>
+          Salin URL halaman tersebut dari browser kamu. Linknya akan mengandung bagian seperti <code class="bg-gray-100 px-1 py-0.5 rounded text-xs">/rating?shop_id=...</code>
+        </li>
+        <li>
+          Tempelkan link tersebut ke dalam kolom input di halaman utama website ini.
+        </li>
+      </ol>
+
+      <div class="bg-orange-50 border-l-4 border-orange-400 px-4 py-3 rounded mt-4 text-sm">
+        <strong>Contoh Link Ulasan Toko:</strong><br>
+        <code class="block mt-1 text-xs bg-gray-100 px-2 py-1 rounded">
+          https://shopee.co.id/buyer/555974029/rating?shop_id=555954448
+        </code>
+      </div>
     </div>
+  </div>
+</div>
+
   </section>
 
   {% include 'components/footer.html' %}
 
-  <!-- Socket.IO -->
+<style>
+  .animate-fade-in {
+    animation: fadeIn 0.3s ease-out;
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: scale(0.95); }
+    to { opacity: 1; transform: scale(1); }
+  }
+</style>
+
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
   <script>
@@ -281,6 +350,18 @@
           window.location.href = "/";
         }
       }
+
+      function showModal(id) {
+    const el = document.getElementById(id);
+    el.classList.remove("hidden");
+    el.classList.add("flex");
+  }
+
+    function hideModal(id) {
+      const el = document.getElementById(id);
+      el.classList.remove("flex");
+      el.classList.add("hidden");
+    }
 
     document.addEventListener("DOMContentLoaded", function () {
     const rows = document.querySelectorAll("#tableBody tr");
@@ -370,9 +451,7 @@
         e.target.submit();
       }, 3000);
     });
-  </script>
 
-<script>
   document.addEventListener("DOMContentLoaded", function () {
     {% if result and result.aspek_persen %}
       const ctx = document.getElementById('pieChart').getContext('2d');

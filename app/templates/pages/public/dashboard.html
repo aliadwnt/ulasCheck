@@ -1,6 +1,6 @@
 {% extends "index.html" %}
 
-{% block title %}Cek Toko Shopee{% endblock %}
+{% block title %}Shoperra - Scraping and Analysis{% endblock %}
 
 {% block content %}
   {% include 'components/navbar.html' %}
@@ -96,21 +96,21 @@
         </div>
       </div>
 
-        <!-- Tombol aksi -->
-        <div class="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-3 mt-6">
+       <!-- Tombol aksi -->
+      <div class="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 gap-3 mt-6">
 
-          <!-- Kartu: Simpan File -->
-          <form method="POST" action="/download/{{ review.id }}">
-            <button type="submit" class="w-full block bg-blue-50 hover:bg-blue-100 text-blue-700 px-3 py-4 rounded-lg shadow transition text-center">
-              <div class="flex flex-col items-center space-y-1">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                    d="M4 16v1a2 2 0 002 2h12a2 2 0 002-2v-1M12 12v9m0 0l-3-3m3 3l3-3M4 4h16v4H4V4z" />
-                </svg>
-                <span class="text-xs font-semibold">Simpan .csv</span>
-              </div>
-            </button>
-          </form>
+        <!-- Kartu: Simpan File -->
+        <form method="POST" action="/download/{{ review.id }}">
+          <button type="submit" class="w-full block bg-blue-50 hover:bg-blue-100 text-blue-700 px-3 py-4 rounded-lg shadow transition text-center">
+            <div class="flex flex-col items-center space-y-1">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M4 16v1a2 2 0 002 2h12a2 2 0 002-2v-1M12 12v9m0 0l-3-3m3 3l3-3M4 4h16v4H4V4z" />
+              </svg>
+              <span class="text-xs font-semibold">Simpan .csv</span>
+            </div>
+          </button>
+        </form>
 
         <!-- Form: Analisis Sekarang -->
         <form id="analyzeForm" method="POST" action="/analyze/{{ review.id }}">
@@ -125,31 +125,20 @@
           </button>
         </form>
 
-          <!-- Kartu: Batal -->
-          <form method="GET" action="/cancel/{{ review.id }}">
-            <button type="submit" class="w-full block bg-red-50 hover:bg-red-100 text-red-700 px-3 py-4 rounded-lg shadow transition text-center">
-              <div class="flex flex-col items-center space-y-1">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                    d="M6 18L18 6M6 6l12 12" />
-                </svg>
-                <span class="text-xs font-semibold">Batal</span>
-              </div>
-            </button>
-          </form>
-
-          <!-- Kartu: Cek Toko Lain -->
-          <a href="/" class="block bg-gray-50 hover:bg-gray-100 text-gray-700 px-3 py-4 rounded-lg shadow transition text-center">
+        <!-- Kartu: Batal -->
+        <form method="GET" action="/cancel/{{ review.id }}">
+          <button type="submit" class="w-full block bg-red-50 hover:bg-red-100 text-red-700 px-3 py-4 rounded-lg shadow transition text-center">
             <div class="flex flex-col items-center space-y-1">
               <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                  d="M21 21l-4.35-4.35M16 10a6 6 0 11-12 0 6 6 0 0112 0z" />
+                  d="M6 18L18 6M6 6l12 12" />
               </svg>
-              <span class="text-xs font-semibold">Ulangi Scraping</span>
+              <span class="text-xs font-semibold">Batal</span>
             </div>
-          </a>
-        </div>
-              {% endif %}
+          </button>
+        </form>
+
+      </div>
 
       {% if result %}
       <!-- Hasil analisis atau cancel -->
@@ -529,4 +518,5 @@
     {% endif %}
   });
 </script>
+{% endif %}
 {% endblock %}

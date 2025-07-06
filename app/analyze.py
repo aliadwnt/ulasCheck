@@ -1,7 +1,7 @@
 import pandas as pd
 import re
 import joblib
-from collections import defaultdict
+from collections import defaultdict, Counter
 from nltk.corpus import stopwords
 
 # === Load Pickle ===
@@ -84,3 +84,24 @@ def analyze_data(df):
         "persen_aspek": persen_tertinggi,
         "aspek_persen": aspek_persen
     }
+
+def get_keyword_frequency(reviews):
+    # Gabungkan semua review jadi satu string
+    all_text = " ".join(reviews).lower()
+
+    # Bersihkan teks dari simbol, angka, dan karakter aneh
+    all_text = re.sub(r'[^a-zA-Z\s]', '', all_text)
+
+    # Tokenisasi manual
+    words = all_text.split()
+
+    # Buang stopwords
+    filtered_words = [word for word in words if word not in stop_words]
+
+    # Hitung frekuensi kata
+    word_counts = Counter(filtered_words)
+
+    # Ambil 50 kata teratas
+    most_common = dict(word_counts.most_common(50))
+
+    return most_common

@@ -28,7 +28,23 @@
 
       <main class="p-6 bg-gray-100 space-y-12">
         <div class="bg-white p-6 rounded-lg shadow-lg max-w-7xl mx-auto">
-          <h1 class="text-2xl font-bold text-gray-800 mb-6">📊 Evaluasi Model</h1>
+          <h1 class="text-2xl font-bold text-gray-800 mb-6">Evaluasi Model</h1>
+            {% with messages = get_flashed_messages(with_categories=true) %}
+              {% if messages %}
+                <div class="max-w-4xl mx-auto">
+                  {% for category, message in messages %}
+                    <div class="flash-message px-4 py-3 rounded relative mb-4 text-sm
+                                {% if category == 'success' %}bg-green-100 text-green-800 border border-green-400
+                                {% elif category == 'error' %}bg-red-100 text-red-800 border border-red-400
+                                {% elif category == 'warning' %}bg-yellow-100 text-yellow-800 border border-yellow-400
+                                {% else %}bg-gray-100 text-gray-800 border border-gray-400{% endif %}">
+                      {{ message }}
+                    </div>
+                  {% endfor %}
+                </div>
+              {% endif %}
+            {% endwith %}
+
 
           <!-- Grid 2 Kolom -->
           <div id="content-grid" class="grid grid-cols-1 md:grid-cols-1 gap-6 mb-10 justify-center">
@@ -39,6 +55,7 @@
               <table class="min-w-full border text-sm text-center">
                 <thead class="bg-gray-200 font-semibold text-gray-700">
                   <tr class="text-xs">
+                    <th class="border px-2 py-1">No</th>                    
                     <th class="border px-2 py-1">Tanggal Evaluasi</th>
                     <th class="border px-2 py-1">Model</th>
                     <th class="border px-2 py-1">Akurasi</th>
@@ -52,6 +69,7 @@
                 <tbody id="evaluation-table" class="bg-white text-xs">
                   {% for row in logs %}
                   <tr>
+                    <td class="border px-4 py-2">{{ loop.index }}</td>
                     <td class="border px-2 py-1">{{ row.evaluationAt.strftime('%d-%m-%Y %H:%M') }}</td>
                     <td class="border px-2 py-1">{{ row.model_name }}</td>
                     <td class="border px-2 py-1">{{ (row.accuracy * 100) | round(2) }}%</td>
@@ -76,204 +94,238 @@
                             d="M2.458 12C3.732 7.943 7.523 5 12 5s8.268 2.943 9.542 7c-1.274 4.057-5.065 7-9.542 7s-8.268-2.943-9.542-7z" />
                         </svg>
                       </button>
-
-                      <button onclick="deleteEvaluation('{{ row.id }}')"
-                        class="bg-red-500 text-white px-2 py-1 rounded text-xs hover:bg-red-600 flex items-center gap-1">
-                      <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6M9 7h6m2 0a2 2 0 00-2-2H9a2 2 0 00-2 2h10z" />
-                        </svg>
-                      </button>
-                  </td>
-
+                        <button
+                          onclick="openDeleteEvalModal('{{ row.id }}')"
+                          class="bg-red-500 text-white px-2 py-1 rounded text-xs hover:bg-red-600 flex items-center gap-1"
+                          title="Hapus"
+                        >
+                          <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                              d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6M9 7h6m2 0a2 2 0 00-2-2H9a2 2 0 00-2 2h10z" />
+                          </svg>
+                        </button>               
+                     </td>
                   </tr>
                   {% endfor %}
                 </tbody>
               </table>
-
+              <span id="totalDataCount" class="text-sm text-gray-600 ml-2"></span>
               <div id="pagination" class="mt-4 flex justify-end items-center space-x-1 text-sm font-medium"></div>
             </div>
 
-            <!-- Bar Chart (Disembunyikan) -->
-          <div id="chart-container" class="flex flex-col items-center w-full md:w-auto relative" style="display: none;">
-          <!-- Tombol X -->
-          <button onclick="hideCharts()" class="absolute top-2 right-2 text-gray-500 hover:text-gray-700 text-lg font-bold">
-            ✕
-          </button>
-
-          <h2 id="chart-title" class="text-center font-semibold text-gray-700 mb-2">
-            Perbandingan Metrik Evaluasi Model
-          </h2>
-
-          <canvas id="evalChart" width="320" height="200"></canvas>
-        </div>
-
+            <div id="chart-container" class="flex flex-col items-center w-full md:w-auto relative" style="display: none;">
+                <button onclick="hideCharts()" class="absolute top-2 right-2 text-gray-500 hover:text-gray-700 text-lg font-bold">
+                  ✕
+                </button>
+                <h2 id="chart-title" class="text-center font-semibold text-gray-700 mb-2">
+                  Perbandingan Metrik Evaluasi Model
+                </h2>
+              <canvas id="evalChart" width="320" height="200"></canvas>
+            </div>
           </div>
         </div>
       </main>
     </div>
   </div>
 
-  <!-- Pagination -->
-  <script>
-    document.addEventListener("DOMContentLoaded", function () {
-  const rows = document.querySelectorAll("#evaluation-table tr"); // ini yang bener
+  <div id="modalDeleteEval" class="fixed inset-0 hidden bg-black bg-opacity-50 items-center justify-center z-50">
+    <div class="bg-white p-6 rounded-lg w-full max-w-md relative">
+      <h2 class="text-lg font-semibold text-orange-600 text-center mb-4">Konfirmasi Hapus Evaluasi</h2>
+      <p class="text-sm text-gray-700 mb-4 text-center">Apakah Anda yakin ingin menghapus data evaluasi ini?</p>
+      <div class="flex justify-end gap-2">
+        <button onclick="closeDeleteEvalModal()" class="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400">Batal</button>
+        <button id="confirmDeleteEvalBtn" class="px-4 py-2 bg-orange-600 text-white rounded hover:bg-orange-700">Hapus</button>
+      </div>
+      <button onclick="closeDeleteEvalModal()" class="absolute top-2 right-3 text-gray-600 hover:text-orange-500 text-xl">×</button>
+    </div>
+  </div>
 
-  if (rows.length === 0) return; // Tambahan proteksi kalau data kosong
-
-  const rowsPerPage = 5;
-  const pageCount = Math.ceil(rows.length / rowsPerPage);
-  const pagination = document.getElementById("pagination");
-  let currentPage = 1;
-
-  function displayPage(page) {
-    const start = (page - 1) * rowsPerPage;
-    const end = start + rowsPerPage;
-
-    rows.forEach((row, index) => {
-      row.style.display = index >= start && index < end ? "" : "none";
-    });
-
-    renderPagination(page);
-  }
-
-  function createPageButton(text, pageNumber) {
-    const btn = document.createElement("button");
-    btn.textContent = text;
-    btn.className = "px-2 py-1 text-sm text-gray-700";
-    btn.addEventListener("click", function () {
-      if (pageNumber >= 1 && pageNumber <= pageCount) {
-        currentPage = pageNumber;
-        displayPage(currentPage);
-      }
-    });
-    return btn;
-  }
-
-  function renderPagination(activePage) {
-    pagination.innerHTML = "";
-
-    const pagesToShow = 5;
-    let startPage = Math.max(1, activePage - 2);
-    let endPage = Math.min(startPage + pagesToShow - 1, pageCount);
-
-    if (endPage - startPage < pagesToShow - 1) {
-      startPage = Math.max(1, endPage - pagesToShow + 1);
-    }
-
-    if (startPage > 1) {
-      const prevBtn = createPageButton("<", activePage - 1);
-      prevBtn.classList.add("hover:font-bold", "mr-2");
-      pagination.appendChild(prevBtn);
-    }
-
-    for (let i = startPage; i <= endPage; i++) {
-      const btn = createPageButton(i, i);
-      btn.className += (i === activePage)
-        ? " underline underline-offset-4 font-semibold text-orange-600"
-        : " hover:underline";
-      pagination.appendChild(btn);
-    }
-
-    if (endPage < pageCount) {
-      const nextBtn = createPageButton(">", activePage + 1);
-      nextBtn.classList.add("hover:font-bold", "ml-2");
-      pagination.appendChild(nextBtn);
-    }
-  }
-
-  displayPage(currentPage);
-});
-  </script>
-
-  <!-- Chart Logic -->
-  <script>
-    let barChartInstance = null;
-
-    function showCharts(data) {
-  const chartContainer = document.getElementById('chart-container');
-  const contentGrid = document.getElementById('content-grid');
-
-  // Ubah grid menjadi 2 kolom
-  contentGrid.classList.remove('md:grid-cols-1');
-  contentGrid.classList.add('md:grid-cols-2');
-
-  // Tampilkan chart
-  chartContainer.style.display = 'flex'; // Ini ganti dari display: none jadi flex
-
-  // Tambahkan animasi jika mau smooth
-  chartContainer.classList.remove('opacity-0');
-
-  if (barChartInstance) barChartInstance.destroy();
-
-  const barCtx = document.getElementById("evalChart").getContext("2d");
-
-  barChartInstance = new Chart(barCtx, {
-    type: "bar",
-    data: {
-      labels: ["Akurasi", "Presisi", "Recall", "F1 Score"],
-      datasets: [{
-        label: data.model_name,
-        data: [
-          data.accuracy * 100,
-          data.precision * 100,
-          data.recall * 100,
-          data.f1_score * 100
-        ],
-        backgroundColor: ["#3b82f6", "#10b981", "#facc15", "#ef4444"]
-      }]
-    },
-    options: {
-      responsive: true,
-      plugins: {
-        legend: { display: false },
-        title: { display: true, text: `Detail Evaluasi Model: ${data.model_name}` }
-      },
-      scales: {
-        y: {
-          beginAtZero: true,
-          max: 100,
-          title: { display: true, text: 'Persentase (%)' }
+    <script>
+      let deleteEvalId = null;
+        function openDeleteEvalModal(id) {
+          deleteEvalId = id;
+          document.getElementById("modalDeleteEval").classList.remove("hidden");
+          document.getElementById("modalDeleteEval").classList.add("flex");
         }
+
+        function closeDeleteEvalModal() {
+          deleteEvalId = null;
+          document.getElementById("modalDeleteEval").classList.add("hidden");
+          document.getElementById("modalDeleteEval").classList.remove("flex");
+        }
+
+        document.getElementById("confirmDeleteEvalBtn").addEventListener("click", async function () {
+          if (!deleteEvalId) return;
+
+          try {
+            const response = await fetch(`/admin/evaluation/delete/${deleteEvalId}`, {
+              method: "POST"
+            });
+
+            if (response.ok) {
+              location.reload();
+            } else {
+              alert("Gagal menghapus data evaluasi.");
+            }
+          } catch (err) {
+            alert("Terjadi kesalahan saat menghapus.");
+          }
+        });
+
+
+      document.addEventListener("DOMContentLoaded", function () {
+      const rows = document.querySelectorAll("#evaluation-table tr"); // ini yang bener
+
+      if (rows.length === 0) return; // Tambahan proteksi kalau data kosong
+
+      const rowsPerPage = 5;
+      const pageCount = Math.ceil(rows.length / rowsPerPage);
+      const pagination = document.getElementById("pagination");
+      let currentPage = 1;
+      updateTotalDataCount();
+
+      function updateTotalDataCount() {
+        const rows = document.querySelectorAll("#evaluation-table tr");
+        const total = rows.length;
+        document.getElementById("totalDataCount").textContent = `Menampilkan ${total} data`;
+      }
+    function displayPage(page) {
+      const start = (page - 1) * rowsPerPage;
+      const end = start + rowsPerPage;
+
+      rows.forEach((row, index) => {
+        row.style.display = index >= start && index < end ? "" : "none";
+      });
+
+      renderPagination(page);
+    }
+
+    function createPageButton(text, pageNumber) {
+      const btn = document.createElement("button");
+      btn.textContent = text;
+      btn.className = "px-2 py-1 text-sm text-gray-700";
+      btn.addEventListener("click", function () {
+        if (pageNumber >= 1 && pageNumber <= pageCount) {
+          currentPage = pageNumber;
+          displayPage(currentPage);
+        }
+      });
+      return btn;
+    }
+
+    function renderPagination(activePage) {
+      pagination.innerHTML = "";
+
+      const pagesToShow = 5;
+      let startPage = Math.max(1, activePage - 2);
+      let endPage = Math.min(startPage + pagesToShow - 1, pageCount);
+
+      if (endPage - startPage < pagesToShow - 1) {
+        startPage = Math.max(1, endPage - pagesToShow + 1);
+      }
+
+      if (startPage > 1) {
+        const prevBtn = createPageButton("<", activePage - 1);
+        prevBtn.classList.add("hover:font-bold", "mr-2");
+        pagination.appendChild(prevBtn);
+      }
+
+      for (let i = startPage; i <= endPage; i++) {
+        const btn = createPageButton(i, i);
+        btn.className += (i === activePage)
+          ? " underline underline-offset-4 font-semibold text-orange-600"
+          : " hover:underline";
+        pagination.appendChild(btn);
+      }
+
+      if (endPage < pageCount) {
+        const nextBtn = createPageButton(">", activePage + 1);
+        nextBtn.classList.add("hover:font-bold", "ml-2");
+        pagination.appendChild(nextBtn);
       }
     }
+
+    displayPage(currentPage);
   });
-}
+    </script>
 
-  function hideCharts() {
-  const chartContainer = document.getElementById('chart-container');
-  const contentGrid = document.getElementById('content-grid');
+    <!-- Chart Logic -->
+    <script>
+      let barChartInstance = null;
 
-  // Ubah grid jadi 1 kolom lagi
-  contentGrid.classList.remove('md:grid-cols-2');
-  contentGrid.classList.add('md:grid-cols-1');
+      function showCharts(data) {
+    const chartContainer = document.getElementById('chart-container');
+    const contentGrid = document.getElementById('content-grid');
 
-  // Sembunyikan chart
-  chartContainer.style.display = 'none';
-}
+    // Ubah grid menjadi 2 kolom
+    contentGrid.classList.remove('md:grid-cols-1');
+    contentGrid.classList.add('md:grid-cols-2');
 
-  </script>
+    // Tampilkan chart
+    chartContainer.style.display = 'flex'; // Ini ganti dari display: none jadi flex
 
-  <!-- Delete Logic -->
-  <script>
-    async function deleteEvaluation(id) {
-      if (!confirm("Yakin ingin menghapus data evaluasi ini?")) return;
+    // Tambahkan animasi jika mau smooth
+    chartContainer.classList.remove('opacity-0');
 
-      try {
-        const response = await fetch(`/admin/evaluation/delete/${id}`, { method: "POST" });
+    if (barChartInstance) barChartInstance.destroy();
 
-        if (response.ok) {
-          alert("Data berhasil dihapus.");
-          location.reload();
-        } else {
-          alert("Gagal menghapus data.");
+    const barCtx = document.getElementById("evalChart").getContext("2d");
+
+    barChartInstance = new Chart(barCtx, {
+      type: "bar",
+      data: {
+        labels: ["Akurasi", "Presisi", "Recall", "F1 Score"],
+        datasets: [{
+          label: data.model_name,
+          data: [
+            data.accuracy * 100,
+            data.precision * 100,
+            data.recall * 100,
+            data.f1_score * 100
+          ],
+          backgroundColor: ["#f97316", "#fb923c", "#fdba74", "#fcd34d"]
+        }]
+      },
+      options: {
+        responsive: true,
+        plugins: {
+          legend: { display: false },
+          title: { display: true, text: `Detail Evaluasi Model: ${data.model_name}` }
+        },
+        scales: {
+          y: {
+            beginAtZero: true,
+            max: 100,
+            title: { display: true, text: 'Persentase (%)' }
+          }
         }
-      } catch (err) {
-        alert("Terjadi kesalahan saat menghapus data.");
       }
-    }
-  </script>
+    });
+  }
 
-</body>
+    function hideCharts() {
+    const chartContainer = document.getElementById('chart-container');
+    const contentGrid = document.getElementById('content-grid');
 
+    // Ubah grid jadi 1 kolom lagi
+    contentGrid.classList.remove('md:grid-cols-2');
+    contentGrid.classList.add('md:grid-cols-1');
+
+    // Sembunyikan chart
+    chartContainer.style.display = 'none';
+  }
+
+  document.addEventListener("DOMContentLoaded", function () {
+      setTimeout(() => {
+        document.querySelectorAll('.flash-message').forEach(msg => {
+          msg.style.transition = 'opacity 0.5s ease-out';
+          msg.style.opacity = '0';
+          setTimeout(() => msg.remove(), 500);
+        });
+      }, 4000); // Muncul 4 detik
+    });
+
+  
+    </script>
+  </body>
 </html>

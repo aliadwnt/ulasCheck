@@ -1,4 +1,4 @@
-from flask import request, render_template, redirect, url_for, flash, jsonify
+from flask import request, render_template, redirect, url_for, flash, jsonify 
 from app import db
 from app.models.datasetModel import Dataset
 from datetime import datetime
@@ -75,7 +75,8 @@ def add_dataset():
         )
         db.session.add(new_data)
         db.session.commit()
-        return "success"
+        flash("Data berhasil ditambahkan!", "success")
+        return redirect(url_for("dataset.get_all_dataset"))
 
     except Exception as e:
         db.session.rollback()
@@ -110,7 +111,8 @@ def edit_dataset(id):
         data.reviewAt = reviewAt_dt
 
         db.session.commit()
-        return "success"
+        flash("Data berhasil diperbarui!", "success")
+        return redirect(url_for("dataset.get_all_dataset"))
 
     except Exception as e:
         db.session.rollback()
@@ -125,10 +127,12 @@ def delete_dataset(id):
         data = Dataset.query.get_or_404(id)
         db.session.delete(data)
         db.session.commit()
-        return "success"
+        flash("✅ <strong>Sukses!</strong> Data review berhasil dihapus.", "success")
+        return redirect(url_for("dataset.get_all_dataset"))
     except Exception as e:
         db.session.rollback()
-        return f"Error: {str(e)}", 500
+        flash("❌ Terjadi kesalahan saat menghapus data.", "danger")
+        return redirect(url_for("dataset.get_all_dataset"))
 
 # ==========================
 # UPLOAD DATASET CSV
@@ -136,32 +140,28 @@ def delete_dataset(id):
 def upload_dataset():
     file = request.files.get('file')
     if not file:
-        return jsonify({"message": "File tidak ditemukan."}), 400
+        flash("File tidak ditemukan.", "danger")
+        return redirect(url_for("dataset.get_all_dataset"))
 
     if not file.filename.lower().endswith('.csv'):
-        return jsonify({"message": "Pastikan file berformat .csv"}), 400
+        flash("Pastikan file berformat .csv", "danger")
+        return redirect(url_for("dataset.get_all_dataset"))
 
     try:
         stream = file.stream.read().decode('utf-8').splitlines()
         csv_reader = csv.DictReader(stream)
-
-        # Buat header di CSV jadi lowercase semua
         csv_reader.fieldnames = [header.strip().lower() for header in csv_reader.fieldnames]
-
-        print(f"Header terbaca: {csv_reader.fieldnames}")
 
         required_fields = ['username', 'produk', 'review', 'rating', 'reviewat']
         if not all(field in csv_reader.fieldnames for field in required_fields):
-            return jsonify({"message": "Format header CSV tidak sesuai."}), 400
+            flash("Format header CSV tidak sesuai.", "danger")
+            return redirect(url_for("dataset.get_all_dataset"))
 
         data_inserted = 0
         for row in csv_reader:
             try:
-                # Ubah key row jadi lowercase semua
                 row = {key.lower(): value for key, value in row.items()}
 
-                # Baca tanggal
-                review_date = None
                 try:
                     review_date = datetime.strptime(row['reviewat'], '%m/%d/%Y %H:%M')
                 except ValueError:
@@ -174,8 +174,7 @@ def upload_dataset():
                             try:
                                 review_date = datetime.strptime(row['reviewat'], '%Y-%m-%d')
                             except ValueError:
-                                print(f"Format tanggal tidak valid pada baris: {row['reviewat']}")
-                                continue  # Skip baris yang error
+                                continue
 
                 new_data = Dataset(
                     username=row['username'],
@@ -188,13 +187,13 @@ def upload_dataset():
                 data_inserted += 1
 
             except Exception as e:
-                print(f"Error pada baris: {row}, Error: {e}")
                 continue
 
         db.session.commit()
-        return jsonify({"message": f"Upload dataset berhasil. Total data masuk: {data_inserted}"}), 200
+        flash(f"Upload dataset berhasil, Total data masuk: {data_inserted} data.", "success")
+        return redirect(url_for("dataset.get_all_dataset"))
 
     except Exception as e:
         db.session.rollback()
-        print(e)
-        return jsonify({"message": "Gagal memproses file. Pastikan data valid."}), 500
+        flash("Gagal memproses file. Pastikan data valid.", "danger")
+        return redirect(url_for("dataset.get_all_dataset"))

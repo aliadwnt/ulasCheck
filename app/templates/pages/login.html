@@ -2,8 +2,8 @@
 <html lang="id">
 <head>
   <meta charset="UTF-8" />
-    <link rel="icon" href="{{ url_for('static', filename='favicon.ico') }}" type="image/x-icon">
-  <title> Shoperra - Login</title>
+  <link rel="icon" href="{{ url_for('static', filename='favicon.ico') }}" type="image/x-icon">
+  <title>Shoperra - Login</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <script src="https://cdn.tailwindcss.com"></script>
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet" />
@@ -14,45 +14,59 @@
   </style>
 </head>
 <body class="bg-gradient-to-br from-orange-100 via-yellow-100 to-white min-h-screen flex items-center justify-center px-4 sm:px-6 lg:px-8">
-  <div class="w-full max-w-md space-y-6 bg-white p-6 sm:p-8 rounded-2xl shadow-xl">
-    <a href="/" class="flex flex-col items-center justify-center mb-6 group transition text-center">
-      <div class="bg-gradient-to-br from-orange-500 to-yellow-400 rounded-full p-3 shadow-lg mb-2 group-hover:scale-105 transition-transform duration-300">
-        <img src="https://img.icons8.com/ios-filled/36/ffffff/search.png" alt="Logo" class="h-6 w-6" />
-      </div>
+  <div class="w-full max-w-md space-y-6 bg-white p-8 sm:p-10 rounded-3xl shadow-2xl transition duration-500">
+    
+    <!-- Logo dan Branding -->
+    <a href="/" class="flex flex-col items-center justify-center mb-6 transition text-center group">
+      <img src="{{ url_for('static', filename='favicon.ico') }}"
+          alt="Logo"
+          class="h-16 w-16 rounded-full transition duration-300 group-hover:brightness-110 group-hover:scale-105" />
+          
       <span class="text-4xl font-extrabold tracking-wide text-gray-800 group-hover:text-orange-600 transition-colors duration-300">
         Shop<span class="text-yellow-400">erra</span>
       </span>
     </a>
 
+    <!-- Judul -->
     <div class="text-center">
-      <h2 class="text-2xl font-bold text-gray-800">Selamat Datang 👋</h2>
-      <p class="mt-1 text-sm text-gray-500">Silakan login untuk masuk ke halaman admin</p>
+      <h2 class="text-2xl font-bold text-gray-800">Login Admin</h2>
+      <p class="mt-1 text-sm text-gray-500">- Masukkan Username dan Password untuk melanjutkan -</p>
     </div>
 
+    <!-- Flash Message -->
     {% with messages = get_flashed_messages(with_categories=true) %}
       {% if messages %}
-        <div class="text-sm text-center">
+        <div class="space-y-2 text-sm text-center">
           {% for category, message in messages %}
-            <p class="{% if category == 'error' %}text-red-600{% else %}text-green-600{% endif %}">
-              {{ message }}
-            </p>
+            <div class="px-4 py-2 rounded-lg font-medium border
+              {% if category == 'error' %}
+                bg-red-100 text-red-700 border-red-300
+              {% elif category == 'success' %}
+                bg-green-100 text-green-700 border-green-300
+              {% else %}
+                bg-gray-100 text-gray-700 border-gray-300
+              {% endif %}
+            ">
+              {{ message|safe }}
+            </div>
           {% endfor %}
         </div>
       {% endif %}
     {% endwith %}
 
-    <form action="{{ url_for('main.login_submit') }}" method="POST" class="space-y-5" autocomplete="off">
+    <!-- Form Login -->
+    <form action="{{ url_for('main.login_submit') }}" method="POST" class="space-y-6" autocomplete="off">
       <div>
         <label for="username" class="block text-sm font-medium text-gray-700 mb-1">Username</label>
         <input type="text" id="username" name="username" required
-               class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-300" />
+               class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-400 transition" />
       </div>
 
       <div>
         <label for="password" class="block text-sm font-medium text-gray-700 mb-1">Password</label>
         <div class="relative">
           <input type="password" id="password" name="password" required
-                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-300 pr-10" />
+                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-400 pr-10 transition" />
           <button type="button" onclick="togglePassword()" class="absolute inset-y-0 right-3 flex items-center text-gray-500 hover:text-orange-600 transition">
             <svg id="eyeIcon" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 transition duration-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path id="eyeOpen" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -67,23 +81,22 @@
       </div>
 
       <button type="submit"
-              class="w-full py-2 px-4 bg-orange-600 text-white font-semibold rounded-lg hover:bg-orange-700 transition duration-300">
+              class="w-full py-2 px-4 bg-gradient-to-r from-orange-500 to-yellow-400 text-white font-semibold rounded-lg hover:opacity-90 transition duration-300">
         Login
       </button>
     </form>
   </div>
 </body>
 </html>
+
 <script>
   function togglePassword() {
     const passwordInput = document.getElementById("password");
-    const eyeIcon = document.getElementById("eyeIcon");
     const eyeOpen = document.getElementById("eyeOpen");
     const eyeOpen2 = document.getElementById("eyeOpen2");
     const eyeClosed = document.getElementById("eyeClosed");
 
     const isHidden = passwordInput.type === "password";
-
     passwordInput.type = isHidden ? "text" : "password";
 
     eyeOpen.classList.toggle("hidden", !isHidden);

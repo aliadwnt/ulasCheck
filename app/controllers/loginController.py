@@ -12,13 +12,13 @@ def login_submit():
 
     if user and user.check_password(password):
         session["user_id"] = user.id
-        flash("Selamat datang, {}! Anda berhasil login.".format(user.username), "success")  # Menampilkan username di flash message
+        flash("<strong>Berhasil Login!</strong><br>Selamat datang, <strong>{}</strong>.".format(user.username), "success")
         return redirect(url_for("admin.admin_dashboard"))
     else:
-        flash("Username atau password yang Anda masukkan salah. Silakan coba lagi.", "danger")  # Menggunakan 'danger' untuk kesalahan
+        flash("<strong>Login Gagal!</strong><br>Username atau password salah.", "error")
         return redirect(url_for("main.login_page"))
 
 def logout():
     session.pop("user_id", None)
-    flash("Anda telah berhasil logout.", "success")  # Flash logout
+    flash("👋 <strong>Logout berhasil!</strong><br>Sampai jumpa lagi!", "success")
     return redirect(url_for("main.login_page"))

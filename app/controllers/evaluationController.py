@@ -123,11 +123,15 @@ def delete_evaluation(id):
     try:
         evaluation = Evaluation.query.get(id)
         if not evaluation:
-            return jsonify({"success": False, "message": "Data evaluasi tidak ditemukan."}), 404
+            flash("Data evaluasi tidak ditemukan.", "error")
+            return redirect(url_for("evaluation.show_evaluation"))  # Fix nama endpoint
 
         db.session.delete(evaluation)
         db.session.commit()
-        return jsonify({"success": True, "message": "Data evaluasi berhasil dihapus."}), 200
+        flash("Data evaluasi berhasil dihapus.", "success")
+        return redirect(url_for("evaluation.show_evaluation"))  # Fix nama endpoint
 
     except Exception as e:
-        return jsonify({"success": False, "message": f"Terjadi kesalahan: {str(e)}"}), 500
+        db.session.rollback()
+        flash(f"Terjadi kesalahan: {str(e)}", "error")
+        return redirect(url_for("evaluation.show_evaluation"))  # Fix nama endpoint

@@ -5,7 +5,9 @@
     <!-- Logo -->
     <a href="/" class="flex flex-col items-center justify-center mb-8 group transition text-center">
       <div class="bg-gradient-to-br from-orange-500 to-yellow-400 rounded-full p-3 shadow-lg mb-2 group-hover:scale-105 transition-transform duration-300">
-        <img src="https://img.icons8.com/ios-filled/36/ffffff/search.png" alt="Logo" class="h-6 w-6" />
+        <div class="bg-white rounded-full p-1">
+          <img src="{{ url_for('static', filename='favicon.ico') }}" alt="Logo" class="h-6 w-6 rounded-full" />
+        </div>
       </div>
       <span class="text-2xl font-extrabold tracking-wide text-white group-hover:text-yellow-300 transition-colors duration-300">
         Shop<span class="text-yellow-200">erra</span>

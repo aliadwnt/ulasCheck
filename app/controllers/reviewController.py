@@ -19,9 +19,10 @@ def show_reviews():
 def download_file(id):
     review = Review.query.get_or_404(id)
     if not review.file_data:
-        flash("File tidak ditemukan.", "error")
+        flash("❌ File tidak ditemukan.", "danger")
         return redirect("/admin/history")
 
+    flash("✅ File berhasil diunduh!", "success")
     return send_file(
         io.BytesIO(review.file_data),
         mimetype="text/csv",
@@ -32,7 +33,7 @@ def download_file(id):
 # ✅ Halaman dataset dengan filter login dan shop_id
 def dataset():
     if "user_id" not in session:
-        flash("Silakan login terlebih dahulu.", "error")
+        flash("❌ Silakan login terlebih dahulu.", "danger")
         return redirect(url_for("main.login_page"))
 
     shop_id = request.args.get("shop_id")
@@ -57,9 +58,9 @@ def add_review():
     file = request.files.get("file")
 
     if not shop_id or not file:
+        flash("❌ ID Toko dan File wajib diisi.", "danger")
         return jsonify(success=False, message="ID Toko dan File wajib diisi."), 400
 
-    # Gunakan timezone Jakarta
     wib = pytz.timezone("Asia/Jakarta")
     now = datetime.now(wib)
 
@@ -74,11 +75,13 @@ def add_review():
     try:
         db.session.add(review)
         db.session.commit()
+        flash("✅ Review berhasil ditambahkan!", "success")
         return jsonify(success=True, message="Review berhasil ditambahkan!")
     except Exception as e:
         db.session.rollback()
+        flash(f"❌ Gagal menambahkan review: {e}", "danger")
         return jsonify(success=False, message=f"Gagal menambahkan review: {e}"), 500
-    
+
 # ✅ Edit review via AJAX
 def edit_review(id):
     review = Review.query.get_or_404(id)
@@ -96,19 +99,25 @@ def edit_review(id):
 
     try:
         db.session.commit()
-        return jsonify(success=True, message="✅ Review berhasil diperbarui!")
+        flash("✅ Review berhasil diperbarui!", "success")
+        return jsonify(success=True, message="Review berhasil diperbarui!")
     except Exception as e:
         db.session.rollback()
+        flash(f"❌ Gagal update: {e}", "danger")
         return jsonify(success=False, message=f"Gagal update: {e}")
 
-# ✅ Hapus review via AJAX
 def delete_review(id):
     review = Review.query.get_or_404(id)
 
     try:
+        for pred in review.predictions:
+            db.session.delete(pred)
+
         db.session.delete(review)
         db.session.commit()
-        return jsonify(success=True, message="✅ Review berhasil dihapus!")
+        flash("✅ Review berhasil dihapus!", "success")
+        return jsonify(success=True, message="Review berhasil dihapus!")
     except Exception as e:
         db.session.rollback()
+        flash(f"❌ Gagal menghapus review: {e}", "danger")
         return jsonify(success=False, message=f"Gagal menghapus review: {e}")

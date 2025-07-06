@@ -20,7 +20,10 @@
       <div class="flex justify-between h-16 items-center">
         <!-- Logo -->
         <div class="flex items-center space-x-2">
-          <img src="https://img.icons8.com/ios-filled/30/ffffff/search.png" alt="Logo" class="h-6 w-6" />
+          <div class="bg-white rounded-full p-1">
+          <img src="{{ url_for('static', filename='favicon.ico') }}" alt="Logo" class="h-6 w-6 rounded-full" />
+        </div>
+
           <a href="/" class="text-2xl font-bold text-white tracking-wide">
            Shop<span class="text-yellow-300">erra</span>
           </a>
@@ -38,9 +41,22 @@
         </div>
 
         <!-- Desktop Navigation Links -->
-        <div class="hidden md:flex items-center space-x-8">
-          <a href="/" class="text-white font-medium hover:text-yellow-200 transition duration-300">Home</a>
-          <a href="/about-us" class="text-white font-medium hover:text-yellow-200 transition duration-300">About Us</a>
+       <div class="hidden md:flex items-center space-x-8">
+          <a href="/" class="text-white font-medium transition duration-300 
+            {% if request.path == '/' %}
+              underline underline-offset-4 decoration-white
+            {% else %}
+              hover:underline
+            {% endif %}
+          ">Home</a>
+
+          <a href="/about-us" class="text-white font-medium transition duration-300 
+            {% if request.path == '/about-us' %}
+              underline underline-offset-4 decoration-white
+            {% else %}
+              hover:underline
+            {% endif %}
+          ">About Us</a>
         </div>
 
         <!-- Login / Username Dropdown -->
@@ -73,8 +89,21 @@
     <!-- Mobile Menu -->
    <div id="mobile-menu" class="hidden md:hidden px-4 pb-4">
   <!-- Link Umum -->
-  <a href="/" class="block text-white py-2 font-medium hover:text-yellow-200">Home</a>
-  <a href="/about-us" class="block text-white py-2 font-medium hover:text-yellow-200">About Us</a>
+ <a href="/" class="block text-white py-2 font-medium 
+  {% if request.path == '/' %}
+    underline underline-offset-4 decoration-white
+  {% else %}
+    hover:underline
+  {% endif %}
+">Home</a>
+
+<a href="/about-us" class="block text-white py-2 font-medium 
+  {% if request.path == '/about-us' %}
+    underline underline-offset-4 decoration-white
+  {% else %}
+    hover:underline
+  {% endif %}
+">About Us</a>
 
   {% if current_user %}
     <!-- Divider -->

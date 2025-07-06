@@ -27,9 +27,11 @@ def shopee(url, cookies_json):
         user_id = path_parts[1] if len(path_parts) > 1 else None
 
         if not shop_id or not user_id:
-            return None, "❌ URL tidak valid. Tidak dapat menemukan shop_id atau user_id."
+            return None, (
+                "❌ URL tidak valid, Lihat panduan cara mendapatkan link ulasan."
+            )
     except Exception as e:
-        return None, f"❌ Gagal memproses URL: {e}"
+        return None, f"❌ Terjadi kesalahan saat memproses URL: {e}"
 
     headers = {
         "content-type": "application/json",

@@ -3,12 +3,13 @@ from app.models.datasetModel import Dataset
 from app.models.evaluationModel import Evaluation
 from app.analyze import clean_text, vectorizer, model
 from app.extensions import db
-
+from babel.dates import format_datetime
 import pandas as pd
 from datetime import datetime
 from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score
-import time
+import time, locale
 
+locale.setlocale(locale.LC_TIME, 'id_ID.UTF-8')
 
 # Tampilkan halaman evaluasi
 def show_evaluation():

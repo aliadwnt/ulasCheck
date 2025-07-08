@@ -123,7 +123,7 @@
                                         Unduh
                                     </a>
                                 </td>
-                                <td class="border px-4 py-2">{{ review.updatedAt }}</td>
+                                <td class="border px-4 py-2">{{ review.createdAt.strftime('%d %B %Y %H:%M') if review.createdAt else 'Belum tersedia' }}</td>
                                 <td class="border px-4 py-2">
                                     <button 
                                         onclick="deleteReview({{ review.id }})" 

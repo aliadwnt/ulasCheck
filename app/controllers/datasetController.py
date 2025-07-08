@@ -2,8 +2,9 @@ from flask import request, render_template, redirect, url_for, flash, jsonify
 from app import db
 from app.models.datasetModel import Dataset
 from datetime import datetime
-import csv
-import re
+import csv, re, locale
+
+locale.setlocale(locale.LC_TIME, 'id_ID.UTF-8')
 
 def remove_emoji(text):
     emoji_pattern = re.compile(
@@ -28,9 +29,14 @@ def get_all_dataset():
 
         for d in data:
             if isinstance(d.reviewAt, datetime):
-                review_date = d.reviewAt.strftime('%Y-%m-%d')
+                review_date = d.reviewAt.strftime('%d %B %Y %H:%M')
             else:
                 review_date = "-"
+
+            if d.createdAt:
+                formatted_createdAt = d.createdAt.strftime('%d %B %Y %H:%M')
+            else:
+                formatted_createdAt = '-'
 
             dataset.append({
                 "id": d.id,
@@ -38,7 +44,8 @@ def get_all_dataset():
                 "product": d.product,
                 "review": d.review,
                 "rating": d.rating,
-                "reviewAt": review_date
+                "reviewAt": review_date,
+                "createdAt": formatted_createdAt
             })
 
         return render_template("pages/admin/dataset.html", dataset=dataset)

@@ -2,13 +2,45 @@
 <html lang="id">
 <head>
   <meta charset="UTF-8" />
-  <link rel="icon" href="{{ url_for('static', filename='favicon.ico') }}" type="image/x-icon">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
   <title>{% block title %}Shoperra{% endblock %}</title>
+
+  <!-- Favicon -->
+  <link rel="icon" href="{{ url_for('static', filename='favicon.ico') }}" type="image/x-icon">
+  <link rel="apple-touch-icon" href="{{ url_for('static', filename='favicon.png') }}"> <!-- Untuk iOS -->
+
+  <!-- Fonts & CSS -->
   <link href="{{ url_for('static', filename='css/output.css') }}" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+
+  <!-- PWA Manifest -->
+  <link rel="manifest" href="{{ url_for('static', filename='manifest.json') }}">
+  <meta name="theme-color" content="#4CAF50" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+  <meta name="apple-mobile-web-app-title" content="Shoperra" />
+
+  <!-- Service Worker Registration -->
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', function () {
+        navigator.serviceWorker.register('{{ url_for("static", filename="serviceWorker.js") }}')
+          .then(function (reg) {
+            console.log("✅ Service Worker registered:", reg.scope);
+          })
+          .catch(function (err) {
+            console.error("❌ Service Worker registration failed:", err);
+          });
+      });
+    }
+  </script>
 </head>
-<body class="bg-gray-50 text-gray-800">
+<body class="bg-gray-50 text-gray-800 font-[Poppins]">
+
   {% block content %}{% endblock %}
+
 </body>
 </html>

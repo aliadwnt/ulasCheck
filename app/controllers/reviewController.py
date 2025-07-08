@@ -9,10 +9,18 @@ from sqlalchemy.orm import joinedload
 
 # ✅ Tampilkan semua riwayat review
 def show_reviews():
+    wib = pytz.timezone("Asia/Jakarta")
     reviews = Review.query.options(
         joinedload(Review.predictions)
     ).order_by(Review.updatedAt.desc()).all()
-    
+
+    # Konversi semua waktu ke WIB
+    for review in reviews:
+        if review.createdAt:
+            review.createdAt = review.createdAt.replace(tzinfo=pytz.utc).astimezone(wib)
+        if review.updatedAt:
+            review.updatedAt = review.updatedAt.replace(tzinfo=pytz.utc).astimezone(wib)
+
     return render_template("pages/admin/history.html", reviews=reviews)
 
 # ✅ Download file review sebagai CSV

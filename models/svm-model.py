@@ -9,7 +9,6 @@ from sklearn.model_selection import train_test_split
 from sklearn.svm import SVC
 from sklearn.metrics import classification_report, confusion_matrix
 
-# Download stopwords
 nltk.download('stopwords')
 from nltk.corpus import stopwords
 stop_words = stopwords.words('indonesian')
@@ -24,7 +23,7 @@ def clean_text(text):
     return text
 
 # --- Load Data ---
-df = pd.read_csv("scraping-result/Dataset.csv")
+df = pd.read_csv("scraping-result/BalancedDataset.csv")
 df.dropna(subset=["Review", "Rating"], inplace=True)
 df["Label"] = df["Rating"].apply(lambda x: 1 if x >= 4 else 0)
 df["CleanReview"] = df["Review"].apply(clean_text)

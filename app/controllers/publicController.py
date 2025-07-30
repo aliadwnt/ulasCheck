@@ -6,7 +6,7 @@ from app.analyze import analyze_data, get_keyword_frequency
 from app.extensions import db
 from urllib.parse import urlparse, parse_qs
 from datetime import datetime
-import io, csv, os
+import io, csv, os, re, unicodedata
 import pandas as pd
 from app.models.predictionModel import Prediction
 
@@ -29,6 +29,20 @@ def index():
             return redirect("/")
             
     return render_template("pages/public/dashboard.html")
+
+def scrapeToko():
+    if request.method == "POST":
+        link = request.form.get("link")
+        cookie_path = "cookies/cookie.json"
+        review_id, message = shopee(link, cookie_path)
+
+        if review_id:
+            return redirect(f"/review/{review_id}")
+        else:
+            flash(message or "Gagal mengambil data review toko.", "danger")
+            return redirect("/")
+            
+    return render_template("pages/public/scrape-toko.html")
 
 def show_review(id):
     review = Review.query.get_or_404(id)
@@ -94,30 +108,53 @@ def analyze_file(id):
 
         # Cari ulasan positif terkait aspek tertinggi
         aspek_tertinggi = hasil.get("aspek_tertinggi", "").lower()
+
         aspek_keywords = {
             "produk": ["produk", "barang", "kualitas", "ukuran", "warna"],
-            "pengiriman": ["pengiriman", "cepat", "packing", "kurir"],
-            "pelayanan": ["pelayanan", "respon", "penjual", "ramah"],
-            # tambahkan aspek lainnya sesuai sistemmu
+            "pengiriman": ["pengiriman", "cepat", "packing", "kurir", "sampai"],
+            "pelayanan": ["pelayanan", "respon", "penjual", "ramah", "tanggap"],
+            "harga": ["harga", "murah", "diskon", "promo", "terjangkau"],
+            "packing": ["packing", "kemasan", "bungkus", "rapi", "aman"]
         }
 
         keywords = aspek_keywords.get(aspek_tertinggi, [])
         highlighted_reviews = []
 
+        # Bersihkan review dulu jika belum ada kolom CleanReview
+        def clean_review(text):
+            # Pastikan teks string
+            text = str(text).lower()
+
+            # Normalisasi karakter unicode (hilangkan simbol aneh & emot)
+            text = unicodedata.normalize("NFKD", text).encode("ascii", "ignore").decode("utf-8", "ignore")
+
+            # Ganti karakter non-huruf (angka, simbol) dengan spasi
+            text = re.sub(r'[^a-zA-Z\s]', ' ', text)
+
+            # Hapus spasi berlebih
+            text = re.sub(r'\s+', ' ', text).strip()
+
+            return text
+
+        if "CleanReview" not in temp_df.columns:
+            temp_df["CleanReview"] = temp_df["Review"].apply(clean_review)
+
         for _, row in temp_df.iterrows():
+            review_text = str(row.get("CleanReview", "")).strip()
             if row.get("Rating", 0) >= 4:
-                review_text = str(row.get("Review", "")).strip()
                 if (
-                    any(kw in review_text.lower() for kw in keywords)
-                    and len(review_text.split()) > 15  # Hanya ulasan panjang
+                    any(kw in review_text for kw in keywords)
+                    and len(review_text.split()) > 15
                 ):
                     highlighted_reviews.append({
                         "Username": row.get("Username", "-"),
-                        "Review": row.get("Review", "-"),
-                        "Rating": row.get("Rating", 0)
+                        "Review": row.get("Review", "-"),  # Tampilkan versi asli
+                        "Rating": row.get("Rating", 0),
+                        "Cleaned": review_text  # Ditampilkan kalau mau
                     })
 
-        highlighted_reviews = highlighted_reviews[:5]  # Batasi hanya 5
+        highlighted_reviews = highlighted_reviews[:5]
+
 
     except Exception as e:
         db.session.rollback()
@@ -148,3 +185,6 @@ def cancel(id):
 
 def about_us():
     return render_template("pages/public/about-us.html")
+
+def scrapeProduk():
+    return render_template("pages/public/scraping-produk.html")

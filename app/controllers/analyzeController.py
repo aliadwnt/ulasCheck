@@ -12,13 +12,10 @@ def analyze_review(review_id):
             flash("File review tidak ditemukan.", "danger")
             return redirect(url_for("public.show_review", id=review_id))
 
-        # Baca CSV ke DataFrame
         df = pd.read_csv(file_path)
 
-        # Jalankan analisis
         hasil = run_analysis(df)
 
-        # Siapkan hasil untuk dikirim ke template
         result = {
             "total_all": hasil.get("total", 0),
             "total_pos": hasil.get("positif", 0),
@@ -31,7 +28,6 @@ def analyze_review(review_id):
             "scraped_data": df.to_dict(orient="records")
         }
 
-        # Kirim ke halaman dashboard.html (atau hasil.html kalau kamu pisah)
         return render_template("pages/public/dashboard.html", result=result, scraped_data=result["scraped_data"], review_id=review_id)
 
     except Exception as e:

@@ -58,7 +58,7 @@
                   <tr class="text-xs">
                     <th class="border px-2 py-1">No</th>                    
                     <th class="border px-2 py-1">Tanggal Evaluasi</th>
-                    <th class="border px-2 py-1">Model</th>
+
                     <th class="border px-2 py-1">Akurasi</th>
                     <th class="border px-2 py-1">Presisi</th>
                     <th class="border px-2 py-1">Recall</th>
@@ -72,7 +72,7 @@
                   <tr>
                     <td class="border px-4 py-2">{{ loop.index }}</td>
                     <td class="border px-2 py-1">{{ row.evaluationAt.strftime('%d-%m-%Y %H:%M') }}</td>
-                    <td class="border px-2 py-1">{{ row.model_name }}</td>
+
                     <td class="border px-2 py-1">{{ (row.accuracy * 100) | round(2) }}%</td>
                     <td class="border px-2 py-1">{{ (row.precision * 100) | round(2) }}%</td>
                     <td class="border px-2 py-1">{{ (row.recall * 100) | round(2) }}%</td>

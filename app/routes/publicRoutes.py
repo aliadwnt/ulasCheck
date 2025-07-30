@@ -13,3 +13,5 @@ public.add_url_rule("/download/<int:id>", view_func=publicController.download_fi
 public.add_url_rule("/analyze/<int:id>", view_func=publicController.analyze_file, methods=["POST"])
 public.add_url_rule("/cancel/<int:id>", view_func=publicController.cancel)
 public.add_url_rule("/about-us", view_func=publicController.about_us)
+public.add_url_rule("/scrape-toko", view_func=publicController.scrapeToko, methods=["GET", "POST"])
+public.add_url_rule("/scrape-produk", view_func=publicController.scrapeProduk)

@@ -6,3 +6,23 @@ cookies
 alembic.ini 
 script.py.mako
 scraping-result
+shopee_debug.html
+home.html
+scrape-toko.html
+scrape-produk.html
+2 Balance- K-Fold-TFIDF Mencari parameter terbaik.ipynb
+aspek_keywords.py
+svm-model.py
+svmterbaru.ipynb
+svm-hyperparameter.ipynb
+hasil_aspek_dataset.csv
+hasil_tuning_svm.csv
+engine.py
+scraperShopAPI.py
+scraperShopSelenium.py
+test.py
+webdriver_scraper.py
+shopee_debug.png
+unknown_reviews.csv
+hasil_crosstab_aspek.xlsx
+BalancedDataset_Label_Aspek.csv
